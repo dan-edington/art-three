@@ -1,70 +1,49 @@
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
 
-import ResizeHandler from './ResizeHandler';
-import Tick from './Tick';
-import SetupRenderer from './SetupRenderer';
-import SetupCamera from './SetupCamera';
-import SetupClock from './SetupClock';
+import Sketch from './Sketch/Sketch';
 
 import './index.css';
 
-const createCube = function () {
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshStandardMaterial( { color: 'tomato' } );
-    return new THREE.Mesh(geometry, material);  
-}
+const test = function () {
+    let cube, lights;
 
-const createLights = function () {
-    return {
-        ambient: new THREE.AmbientLight(0xffffff, 0.25),
-        point: new THREE.PointLight(0xffffff, 1.0),
-    }
-}
+    const gui = new dat.GUI();
 
-function Sketch() {
-
-    this.variables = {
+    const vars = {
         rotation: 0,
     };
+
+    const createCube = function () {
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.MeshStandardMaterial( { color: 'hotpink' } );
+        return new THREE.Mesh(geometry, material);  
+    }
     
-    this.init = function () {
-        this.scene = new THREE.Scene();
-        this.tick = Tick.bind(this);
-
-        SetupRenderer.bind(this)();
-        SetupCamera.bind(this)();
-        SetupClock.bind(this)();
-
-        window.addEventListener('resize', ResizeHandler.bind(this));
-        
-        this.gui = new dat.GUI();
+    const createLights = function () {
+        return {
+            ambient: new THREE.AmbientLight(0xffffff, 0.25),
+            point: new THREE.PointLight(0xffffff, 1.0),
+        }
     }
 
-    this.setup = function () {
-        this.gui.add(this.variables, 'rotation', 0, Math.PI * 2, 0.001);
+    const setup = () => {
+        gui.add(vars, 'rotation', 0, Math.PI * 2, 0.001);
+        lights = createLights();
+        lights.point.position.set(2, 2, 2);
+        cube = createCube();
+        this.scene.add(cube, ...Object.values(lights));
+    };
 
-        this.lights = createLights();
-        this.lights.point.position.set(2, 2, 2);
-
-        this.cube = createCube();
-
-        this.scene.add(this.cube, ...Object.values(this.lights));
-    }
-
-    this.onFrame = function () {
-        this.cube.rotation.y = this.variables.rotation;
-    }
+    const onFrame = () => {
+        cube.rotation.y = vars.rotation;
+    };
 
     return {
-        start: () => {
-            this.init();
-            this.setup();
-            this.tick();
-        },
+        setup,
+        onFrame,
     }
+}
 
-};
-
-const s = new Sketch();
+const s = new Sketch(test);
 s.start();
