@@ -6,16 +6,18 @@ import SetupRenderer from './SetupRenderer';
 import SetupCamera from './SetupCamera';
 import SetupClock from './SetupClock';
 
-function Sketch(
-  sketchFunctions,
-  options = {
-      useOrbit: true,
-  }
-) {
+class Sketch {
 
-  this.useOrbit = options.useOrbit;
-  
-  this.init = function () {
+  constructor (
+    sketchFunctions,
+    options = {
+      useOrbit: true,
+    }
+  ) {
+
+    this.useOrbit = options.useOrbit;
+
+    this.init = function () {
       this.scene = new THREE.Scene();
       this.tick = Tick.bind(this);
 
@@ -26,16 +28,17 @@ function Sketch(
       window.addEventListener('resize', ResizeHandler.bind(this));
 
       this.sketchFunctions = sketchFunctions.bind(this)();
-  }
+    };
 
-  return {
+    return {
       start: () => {
-          this.init();
-          this.sketchFunctions.setup();
-          this.tick();
+        this.init();
+        this.sketchFunctions.setup();
+        this.tick();
       },
-  }
+    };
 
+  }
 };
 
 export default Sketch;
