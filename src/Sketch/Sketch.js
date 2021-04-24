@@ -13,7 +13,6 @@ function Sketch(
   }
 ) {
 
-  this.sketchFunctions = sketchFunctions.bind(this)();
   this.useOrbit = options.useOrbit;
   
   this.init = function () {
@@ -25,6 +24,8 @@ function Sketch(
       SetupClock.bind(this)();
 
       window.addEventListener('resize', ResizeHandler.bind(this));
+
+      this.sketchFunctions = sketchFunctions.bind(this)();
   }
 
   return {
