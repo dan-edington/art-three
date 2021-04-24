@@ -1,27 +1,58 @@
 import * as THREE from 'three';
-import resizeHandlers from './resizeHandlers'
-import initCamera from './camera';
-import animate from './animate';
 
-const scene = new THREE.Scene();
-const camera = initCamera();
+import ResizeHandler from './ResizeHandler';
+import Tick from './Tick';
+import SetupRenderer from './SetupRenderer';
+import SetupCamera from './SetupCamera';
+import SetupClock from './SetupClock';
 
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+import './index.css';
 
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+function Sketch() {
 
+    this.scene = new THREE.Scene();
+    this.tick = Tick.bind(this);
 
-const RENAMETHISPLZ = {
-    scene,
-    camera,
-    renderer
-}
+    SetupRenderer.bind(this)();
+    SetupCamera.bind(this)();
+    SetupClock.bind(this)();
 
+    window.addEventListener('resize', ResizeHandler.bind(this));
 
-resizeHandlers(RENAMETHISPLZ);
-animate(RENAMETHISPLZ);
+    this.addLights = function () {
+        this.lights = {
+            ambient: new THREE.AmbientLight(0xffffff, 0.25),
+            point: new THREE.PointLight(0xffffff, 1.0),
+        }
+        this.scene.add(this.lights.ambient);
+        this.scene.add(this.lights.point);
+        this.lights.point.position.set(0, 2, 2);
+    }
+
+    this.createCube = function () {
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.MeshStandardMaterial( { color: 'tomato' } );
+        return new THREE.Mesh(geometry, material);  
+    }
+
+    this.setup = function () {
+        this.addLights();
+        this.cube = this.createCube();
+        this.scene.add(this.cube);
+    }
+
+    this.onFrame = function () {
+        this.cube.rotation.y = Math.PI * this.clock.getElapsedTime() * 0.1;
+    }
+
+    return {
+        start: () => {
+            this.setup();
+            this.tick();
+        },
+    }
+
+};
+
+const s = new Sketch();
+s.start();
