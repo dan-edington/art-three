@@ -81,18 +81,28 @@ vec3 curlNoise( vec3 p ){
 void main() {
   vUv = uv;
   
-  float p = uProgress + 0.25;
+  if (uProgress >= 1. || uProgress <= 0.01) {
 
-  vec3 newPosition = curlNoise(vec3(
-    vUv.x * p + p,
-    vUv.y * p + p,
-    p
-  ));
+    gl_PointSize = 1.;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 
-  newPosition.x += (uImageWidth * uProgress) - 0.15;
-  newPosition.y *= 0.5;
+  } else {
 
-  parabola = 1.0 - abs(uProgress * 2.0 - 1.0);
-  gl_PointSize = parabola * 10.0;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position + newPosition, 1.0);
+    float p = uProgress + 0.25;
+
+    vec3 newPosition = curlNoise(vec3(
+      vUv.x * p + p,
+      vUv.y * p + p,
+      p
+    ));
+
+    newPosition.x += (uImageWidth * uProgress) - 0.15;
+    newPosition.y *= 0.5;
+
+    parabola = 1.0 - abs(uProgress * 2.0 - 1.0);
+    gl_PointSize = parabola * 20.0;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position + newPosition, 1.0);
+
+  }
+
 }

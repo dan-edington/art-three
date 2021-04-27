@@ -9,13 +9,13 @@ import particlesFrag from './shaders/particles.frag';
 import particlesVert from './shaders/particles.vert';
 
 export default function () {
-  let lights, imagePlane, particles, imageWidth;
-
-  const gui = new dat.GUI();
+  let gui, lights, imagePlane, particles, imageWidth;
 
   const vars = {
       progress: 0.0,
   };
+
+  const pCountXY = 30;
   
   const createLights = function () {
     return {
@@ -49,7 +49,7 @@ export default function () {
   }
 
   const createParticles = function () {
-    const plane = new THREE.PlaneBufferGeometry(0.1, 1, 50, 50);
+    const plane = new THREE.PlaneBufferGeometry(0.1, 1, pCountXY, pCountXY);
     const particlesMaterial = new THREE.ShaderMaterial({
       uniforms: {
         uProgress: { type: 'f', value: vars.progress },
@@ -72,11 +72,12 @@ export default function () {
   }
 
   const setupGUI = () => {
+    gui = new dat.GUI();
     gui.add(vars, 'progress', 0.0, 1.0, 0.01).onChange(updateUniforms);
   }
 
   const startAnimation = () => {
-    gsap.to(vars, { duration: 10, progress: 1.0, ease: 'expo.out', onUpdate: updateUniforms });
+    gsap.to(vars, { duration: 10, progress: 1.0, ease: 'power2.out', onUpdate: updateUniforms });
   }
 
   const setup = async () => {
@@ -86,8 +87,8 @@ export default function () {
     lights = createLights();
     lights.point.position.set(2, 2, 2);
     this.scene.add(imagePlane, particles, ...Object.values(lights));
-    setupGUI();
-    //window.addEventListener('click', startAnimation);
+    //setupGUI();
+    window.addEventListener('click', startAnimation);
   };
 
   const onFrame = () => {};
