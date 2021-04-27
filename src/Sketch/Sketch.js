@@ -31,9 +31,9 @@ class Sketch {
     };
 
     return {
-      start: () => {
+      start: async () => {
         this.init();
-        this.sketchFunctions.setup();
+        await this.sketchFunctions.setup();
         this.tick();
       },
     };

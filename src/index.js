@@ -1,6 +1,7 @@
 import Sketch from './Sketch/Sketch';
-import defaultCube from './sketches/defaultCube';
+// import defaultCube from './sketches/defaultCube/defaultCube';
+import deptLogo from './sketches/deptLogo/deptLogo';
 import './index.css';
 
-const s = new Sketch(defaultCube);
+const s = new Sketch(deptLogo);
 s.start();
