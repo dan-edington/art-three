@@ -1,5 +1,5 @@
 export default function () {
-  this.sketchFunctions.onFrame();
+  this.onFrame();
   if (this.orbit) {
     this.orbit.update();
   }

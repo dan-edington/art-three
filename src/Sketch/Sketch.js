@@ -8,12 +8,19 @@ import SetupClock from './SetupClock';
 
 class Sketch {
 
-  constructor (
-    sketchFunctions,
-    options = {
-      useOrbit: true,
-    }
-  ) {
+  constructor (sketchFn) {
+
+    const { 
+      setup, 
+      onFrame, 
+      options = {
+        useOrbit: true,
+      } 
+    } = sketchFn.bind(this)();
+
+    this.setup = setup;
+    this.onFrame = onFrame;
+    this.useOrbit = options.useOrbit;
 
     this.useOrbit = options.useOrbit;
 
@@ -26,14 +33,12 @@ class Sketch {
       SetupClock.bind(this)();
 
       window.addEventListener('resize', ResizeHandler.bind(this));
-
-      this.sketchFunctions = sketchFunctions.bind(this)();
     };
 
     return {
       start: async () => {
         this.init();
-        await this.sketchFunctions.setup();
+        await this.setup();
         this.tick();
       },
     };

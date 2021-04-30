@@ -96,5 +96,8 @@ export default function () {
   return {
     setup,
     onFrame,
+    options: {
+      useOrbit: false,
+    }
   }
 }
