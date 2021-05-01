@@ -1,14 +1,25 @@
 import * as THREE from 'three';
-
 import ResizeHandler from './ResizeHandler';
 import Tick from './Tick';
 import SetupRenderer from './SetupRenderer';
 import SetupCamera from './SetupCamera';
 import SetupClock from './SetupClock';
 
-class Sketch {
+class Sketch implements Sketch {
 
-  constructor (sketchFn) {
+  start: Function
+  setup: Function
+  onFrame: Function
+  init: Function
+  tick: Function
+  renderer: THREE.WebGLRenderer
+  camera: THREE.PerspectiveCamera | THREE.OrthographicCamera
+  scene: THREE.Scene
+  clock: THREE.Clock
+  orbit: any
+  useOrbit: boolean
+
+  constructor (sketchFn: Function) {
 
     const { 
       setup, 
@@ -22,8 +33,6 @@ class Sketch {
     this.onFrame = onFrame;
     this.useOrbit = options.useOrbit;
 
-    this.useOrbit = options.useOrbit;
-
     this.init = function () {
       this.scene = new THREE.Scene();
       this.tick = Tick.bind(this);
@@ -35,13 +44,11 @@ class Sketch {
       window.addEventListener('resize', ResizeHandler.bind(this));
     };
 
-    return {
-      start: async () => {
-        this.init();
-        await this.setup();
-        this.tick();
-      },
-    };
+    this.start = async () => {
+      this.init();
+      await this.setup();
+      this.tick();
+    }
 
   }
 };

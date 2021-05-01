@@ -3,5 +3,5 @@ import Sketch from './Sketch/Sketch';
 import deptLogo from './sketches/deptLogo/deptLogo';
 import './index.css';
 
-const s = new Sketch(deptLogo);
+const s: Sketch = new Sketch(deptLogo);
 s.start();

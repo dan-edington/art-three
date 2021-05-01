@@ -8,8 +8,12 @@ import imagePlaneVert from './shaders/imagePlane.vert';
 import particlesFrag from './shaders/particles.frag';
 import particlesVert from './shaders/particles.vert';
 
-export default function () {
-  let gui, lights, imagePlane, particles, imageWidth;
+export default function (this: Sketch) {
+  let gui
+  let lights;
+  let imagePlane: THREE.Mesh<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>;
+  let particles: THREE.Points<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>;
+  let imageWidth: number;
 
   const vars = {
       progress: 0.0,
@@ -25,7 +29,7 @@ export default function () {
   }
 
   const createImagePlane = function () {
-    return new Promise((resolve, reject) => {
+    return new Promise<THREE.Mesh<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>>((resolve, reject) => {
 
       new THREE.TextureLoader().load(logo, (texture) => {
 
@@ -34,8 +38,8 @@ export default function () {
 
         const planeMaterial = new THREE.ShaderMaterial({
           uniforms: {
-            uTexture: { type: 't', value: texture },
-            uProgress: { type: 'f', value: vars.progress },
+            uTexture: { value: texture },
+            uProgress: { value: vars.progress },
           },
           vertexShader: imagePlaneVert,
           fragmentShader: imagePlaneFrag,
@@ -43,6 +47,7 @@ export default function () {
         });
 
         resolve(new THREE.Mesh(plane, planeMaterial));
+
       });
 
     })
@@ -52,8 +57,8 @@ export default function () {
     const plane = new THREE.PlaneBufferGeometry(0.1, 1, pCountXY, pCountXY);
     const particlesMaterial = new THREE.ShaderMaterial({
       uniforms: {
-        uProgress: { type: 'f', value: vars.progress },
-        uImageWidth: { type: 'f', value: imageWidth },
+        uProgress: { value: vars.progress },
+        uImageWidth: { value: imageWidth },
       },
       vertexShader: particlesVert,
       fragmentShader: particlesFrag,

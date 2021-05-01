@@ -4,7 +4,7 @@ const MiniCSSExtractPlugin = require('mini-css-extract-plugin')
 const path = require('path')
 
 module.exports = {
-    entry: path.resolve(__dirname, '../src/index.js'),
+    entry: path.resolve(__dirname, '../src/index.ts'),
     output:
     {
         filename: 'bundle.[contenthash].js',
@@ -33,7 +33,18 @@ module.exports = {
                 test: /\.(html)$/,
                 use: ['html-loader']
             },
-
+            // Typescript
+            {
+                test: /\.ts?$/,
+                exclude: /node_modules/,
+                use: {
+                  loader: 'ts-loader',
+                //   options: {
+                //     // disable type checker - we will use it in fork plugin
+                //     transpileOnly: true
+                //   }
+                }
+            },
             // JS
             {
                 test: /\.js$/,
@@ -89,5 +100,8 @@ module.exports = {
                 ]
             }
         ]
-    }
+    },
+    resolve: {
+      extensions: [".ts", ".js"]
+    },
 }
