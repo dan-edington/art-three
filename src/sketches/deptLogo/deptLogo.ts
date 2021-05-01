@@ -8,7 +8,7 @@ import imagePlaneVert from './shaders/imagePlane.vert';
 import particlesFrag from './shaders/particles.frag';
 import particlesVert from './shaders/particles.vert';
 
-export default function (this: Sketch) {
+export default function (this: SketchClass): SketchFunction {
   let gui
   let lights;
   let imagePlane: THREE.Mesh<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>;

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-export default function(this: Sketch) {
+export default function(this: SketchClass) {
   if (this.camera instanceof THREE.PerspectiveCamera) {
     this.camera.aspect = window.innerWidth / window.innerHeight;
   }

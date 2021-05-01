@@ -1,4 +1,4 @@
-export default function (this: Sketch) {
+export default function (this: SketchClass) {
   this.onFrame();
   if (this.orbit) {
     this.orbit.update();

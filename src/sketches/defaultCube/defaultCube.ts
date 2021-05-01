@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
 
-export default function (this: Sketch) {
+export default function (this: SketchClass): SketchFunction {
   let cube: THREE.Mesh;
   let lights;
 

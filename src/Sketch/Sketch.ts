@@ -5,19 +5,19 @@ import SetupRenderer from './SetupRenderer';
 import SetupCamera from './SetupCamera';
 import SetupClock from './SetupClock';
 
-class Sketch implements Sketch {
+class Sketch implements SketchClass {
 
   start: Function
   setup: Function
   onFrame: Function
   init: Function
   tick: Function
+  options: SketchOptions
   renderer: THREE.WebGLRenderer
   camera: THREE.PerspectiveCamera | THREE.OrthographicCamera
   scene: THREE.Scene
   clock: THREE.Clock
-  orbit: any
-  useOrbit: boolean
+  orbit: OrbitControls
 
   constructor (sketchFn: Function) {
 
@@ -29,11 +29,11 @@ class Sketch implements Sketch {
       } 
     } = sketchFn.bind(this)();
 
+    this.options = options;
     this.setup = setup;
     this.onFrame = onFrame;
-    this.useOrbit = options.useOrbit;
 
-    this.init = function () {
+    this.start = async () => {
       this.scene = new THREE.Scene();
       this.tick = Tick.bind(this);
 
@@ -42,11 +42,9 @@ class Sketch implements Sketch {
       SetupClock.bind(this)();
 
       window.addEventListener('resize', ResizeHandler.bind(this));
-    };
 
-    this.start = async () => {
-      this.init();
       await this.setup();
+
       this.tick();
     }
 
