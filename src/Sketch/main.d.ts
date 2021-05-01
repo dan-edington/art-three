@@ -1,3 +1,4 @@
+
 interface OrbitControls {
 
   object: THREE.Camera;
@@ -67,8 +68,7 @@ interface OrbitControls {
 
   dispatchEvent(event: { type: string; target: any }): void;
 }
-
-interface SketchClass {
+interface Sketch {
   start: Function
   setup: Function
   onFrame: Function
@@ -80,10 +80,12 @@ interface SketchClass {
   scene: THREE.Scene
   clock: THREE.Clock
   orbit: OrbitControls
+  stats: Stats | null
 }
 
 interface SketchOptions {
-  useOrbit: boolean
+  useOrbit?: boolean
+  showStats?: boolean
 }
 
 interface SketchFunction {

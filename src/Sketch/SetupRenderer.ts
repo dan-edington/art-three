@@ -1,6 +1,7 @@
 import * as THREE from 'three';
+import Sketch from './Sketch';
 
-export default function (this: SketchClass) {
+export default function (this: Sketch) {
   this.renderer = new THREE.WebGLRenderer({
     antialias: true,
   });

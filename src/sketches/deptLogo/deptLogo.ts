@@ -7,14 +7,15 @@ import imagePlaneFrag from './shaders/imagePlane.frag';
 import imagePlaneVert from './shaders/imagePlane.vert';
 import particlesFrag from './shaders/particles.frag';
 import particlesVert from './shaders/particles.vert';
+import Sketch from '../../Sketch/Sketch';
 
-export default function (this: SketchClass): SketchFunction {
+export default function (this: Sketch): SketchFunction {
   let gui
   let lights;
   let imagePlane: THREE.Mesh<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>;
   let particles: THREE.Points<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>;
   let imageWidth: number;
-
+  
   const vars = {
       progress: 0.0,
   };
@@ -103,6 +104,7 @@ export default function (this: SketchClass): SketchFunction {
     onFrame,
     options: {
       useOrbit: false,
+      showStats: true,
     }
   }
 }

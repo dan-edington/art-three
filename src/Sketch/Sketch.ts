@@ -1,11 +1,12 @@
 import * as THREE from 'three';
+import Stats from 'three/examples/jsm/libs/stats.module';
 import ResizeHandler from './ResizeHandler';
 import Tick from './Tick';
 import SetupRenderer from './SetupRenderer';
 import SetupCamera from './SetupCamera';
 import SetupClock from './SetupClock';
 
-class Sketch implements SketchClass {
+class Sketch {
 
   start: Function
   setup: Function
@@ -18,6 +19,7 @@ class Sketch implements SketchClass {
   scene: THREE.Scene
   clock: THREE.Clock
   orbit: OrbitControls
+  stats: Stats | null
 
   constructor (sketchFn: Function) {
 
@@ -26,14 +28,22 @@ class Sketch implements SketchClass {
       onFrame, 
       options = {
         useOrbit: true,
+        showStats: false,
       } 
     } = sketchFn.bind(this)();
 
     this.options = options;
     this.setup = setup;
     this.onFrame = onFrame;
+    this.stats = this.options.showStats ? Stats() : null;
 
     this.start = async () => {
+
+      if (this.stats) {
+        this.stats.showPanel(0);
+        document.body.appendChild(this.stats.dom);
+      }
+
       this.scene = new THREE.Scene();
       this.tick = Tick.bind(this);
 
