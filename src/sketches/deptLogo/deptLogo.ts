@@ -2,12 +2,14 @@ import * as THREE from 'three';
 import * as dat from 'dat.gui';
 import gsap from 'gsap';
 
+import Sketch from '../../Sketch/Sketch';
+import { SketchFunction } from '../../types/sketch';
+
 import logo from './deptLogo.png';
 import imagePlaneFrag from './shaders/imagePlane.frag';
 import imagePlaneVert from './shaders/imagePlane.vert';
 import particlesFrag from './shaders/particles.frag';
 import particlesVert from './shaders/particles.vert';
-import Sketch from '../../Sketch/Sketch';
 
 export default function (this: Sketch): SketchFunction {
   let gui: dat.GUI;
@@ -20,38 +22,45 @@ export default function (this: Sketch): SketchFunction {
       progress: 0.0,
   };
 
-  const pCountXY = 30;
+  const pCountXY: number = 30;
   
-  const createLights = function (): object {
+  interface lightObject {
+    [key: string]: THREE.Light
+  }
+
+  const createLights = function (): lightObject {
     return {
         ambient: new THREE.AmbientLight(0xffffff, 0.25),
         point: new THREE.PointLight(0xffffff, 1.0),
     }
   }
 
-  const createImagePlane = function () {
-    return new Promise<THREE.Mesh<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>>((resolve, reject) => {
+  const createImagePlane = function (): Promise<THREE.Mesh<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>> {
 
-      new THREE.TextureLoader().load(logo, (texture) => {
+    return new Promise<THREE.Mesh<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>>
+      ((resolve, reject) => {
 
-        imageWidth = texture.image.width / texture.image.height;
-        const plane = new THREE.PlaneBufferGeometry(imageWidth, 1, 1, 1);
+        new THREE.TextureLoader().load(logo, (texture) => {
 
-        const planeMaterial = new THREE.ShaderMaterial({
-          uniforms: {
-            uTexture: { value: texture },
-            uProgress: { value: vars.progress },
-          },
-          vertexShader: imagePlaneVert,
-          fragmentShader: imagePlaneFrag,
-          transparent: true,
+          imageWidth = texture.image.width / texture.image.height;
+          const plane = new THREE.PlaneBufferGeometry(imageWidth, 1, 1, 1);
+
+          const planeMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+              uTexture: { value: texture },
+              uProgress: { value: vars.progress },
+            },
+            vertexShader: imagePlaneVert,
+            fragmentShader: imagePlaneFrag,
+            transparent: true,
+          });
+
+          resolve(new THREE.Mesh(plane, planeMaterial));
+
         });
-
-        resolve(new THREE.Mesh(plane, planeMaterial));
 
       });
 
-    })
   }
 
   const createParticles = function (): THREE.Points<THREE.PlaneBufferGeometry, THREE.ShaderMaterial> {
@@ -86,7 +95,7 @@ export default function (this: Sketch): SketchFunction {
     gsap.to(vars, { duration: 10, progress: 1.0, ease: 'power2.out', onUpdate: updateUniforms });
   }
 
-  const setup = async () => {
+  const setup = async (): Promise<any> => {
     this.renderer.setClearColor(0x000000);
     imagePlane = await createImagePlane();
     particles = createParticles();

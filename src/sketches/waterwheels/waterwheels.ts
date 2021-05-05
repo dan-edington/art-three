@@ -2,6 +2,7 @@ import * as CANNON from 'cannon-es';
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
 import Sketch from '../../Sketch/Sketch';
+import { SketchFunction } from '../../types/sketch';
 
 export default function(this: Sketch): SketchFunction {
 

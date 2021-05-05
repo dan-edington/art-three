@@ -5,7 +5,8 @@ import Tick from './Tick';
 import SetupRenderer from './SetupRenderer';
 import SetupCamera from './SetupCamera';
 import SetupClock from './SetupClock';
-
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { SketchOptions } from '../types/sketch';
 class Sketch {
 
   start: Function
