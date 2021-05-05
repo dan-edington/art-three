@@ -10,19 +10,19 @@ import particlesVert from './shaders/particles.vert';
 import Sketch from '../../Sketch/Sketch';
 
 export default function (this: Sketch): SketchFunction {
-  let gui
+  let gui: dat.GUI;
   let lights;
   let imagePlane: THREE.Mesh<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>;
   let particles: THREE.Points<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>;
   let imageWidth: number;
-  
+
   const vars = {
       progress: 0.0,
   };
 
   const pCountXY = 30;
   
-  const createLights = function () {
+  const createLights = function (): object {
     return {
         ambient: new THREE.AmbientLight(0xffffff, 0.25),
         point: new THREE.PointLight(0xffffff, 1.0),
@@ -54,7 +54,7 @@ export default function (this: Sketch): SketchFunction {
     })
   }
 
-  const createParticles = function () {
+  const createParticles = function (): THREE.Points<THREE.PlaneBufferGeometry, THREE.ShaderMaterial> {
     const plane = new THREE.PlaneBufferGeometry(0.1, 1, pCountXY, pCountXY);
     const particlesMaterial = new THREE.ShaderMaterial({
       uniforms: {
@@ -72,17 +72,17 @@ export default function (this: Sketch): SketchFunction {
     return particles;
   }
 
-  const updateUniforms = () => {
+  const updateUniforms = (): void => {
     imagePlane.material.uniforms.uProgress.value = vars.progress;
     particles.material.uniforms.uProgress.value = vars.progress;
   }
 
-  const setupGUI = () => {
+  const setupGUI = (): void => {
     gui = new dat.GUI();
     gui.add(vars, 'progress', 0.0, 1.0, 0.01).onChange(updateUniforms);
   }
 
-  const startAnimation = () => {
+  const startAnimation = (): void => {
     gsap.to(vars, { duration: 10, progress: 1.0, ease: 'power2.out', onUpdate: updateUniforms });
   }
 
@@ -97,7 +97,7 @@ export default function (this: Sketch): SketchFunction {
     window.addEventListener('click', startAnimation);
   };
 
-  const onFrame = () => {};
+  const onFrame = (): void => {};
 
   return {
     setup,

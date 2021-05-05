@@ -68,6 +68,7 @@ interface OrbitControls {
 
   dispatchEvent(event: { type: string; target: any }): void;
 }
+
 interface Sketch {
   start: Function
   setup: Function
