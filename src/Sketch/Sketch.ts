@@ -45,12 +45,13 @@ class Sketch implements SketchClass {
 
       this.shouldRender = true;
       this.scene = new THREE.Scene();
-      this.scene.add(this.camera);
       this.tick = Tick.bind(this);
 
       SetupRenderer.bind(this)();
       SetupCamera.bind(this)();
       SetupClock.bind(this)();
+
+      this.scene.add(this.camera);
 
       window.addEventListener('resize', ResizeHandler.bind(this));
 
