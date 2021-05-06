@@ -2,11 +2,13 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "noImplicitAny": true,
-    "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
-    "module": "commonjs",
+    "module": "es2020",
+    "esModuleInterop": true,
     "target": "es5",
-    "jsx": "react",
-    "allowJs": true
+    "allowJs": false,
+    "typeRoots": [
+      "@types",
+      "node_modules/@types" 
+    ],
   }
 }

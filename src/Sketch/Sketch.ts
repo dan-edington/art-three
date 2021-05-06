@@ -6,40 +6,35 @@ import SetupRenderer from './SetupRenderer';
 import SetupCamera from './SetupCamera';
 import SetupClock from './SetupClock';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { SketchOptions } from '../types/sketch';
-class Sketch {
+import { SketchOptions, SketchClass, SketchObject } from '../types/sketch';
+class Sketch implements SketchClass {
+  start: () => void;
+  setup: () => void;
+  onFrame: () => void;
+  init: () => void;
+  tick: () => void;
+  options: SketchOptions;
+  renderer: THREE.WebGLRenderer;
+  camera: THREE.PerspectiveCamera | THREE.OrthographicCamera;
+  scene: THREE.Scene;
+  clock: THREE.Clock;
+  orbit: OrbitControls;
+  stats: Stats | null;
 
-  start: Function
-  setup: Function
-  onFrame: Function
-  init: Function
-  tick: Function
-  options: SketchOptions
-  renderer: THREE.WebGLRenderer
-  camera: THREE.PerspectiveCamera | THREE.OrthographicCamera
-  scene: THREE.Scene
-  clock: THREE.Clock
-  orbit: OrbitControls
-  stats: Stats | null
+  constructor(sketchFn: () => SketchObject) {
+    const { setup, onFrame, options } = sketchFn.bind(this)();
 
-  constructor (sketchFn: Function) {
+    const defaultOptions = {
+      useOrbit: true,
+      showStats: false,
+    };
 
-    const { 
-      setup, 
-      onFrame, 
-      options = {
-        useOrbit: true,
-        showStats: false,
-      } 
-    } = sketchFn.bind(this)();
-
-    this.options = options;
+    this.options = { ...defaultOptions, ...options };
     this.setup = setup;
     this.onFrame = onFrame;
     this.stats = this.options.showStats ? Stats() : null;
 
     this.start = async () => {
-
       if (this.stats) {
         this.stats.showPanel(0);
         document.body.appendChild(this.stats.dom);
@@ -57,9 +52,8 @@ class Sketch {
       await this.setup();
 
       this.tick();
-    }
-
+    };
   }
-};
+}
 
 export default Sketch;

@@ -1,46 +1,47 @@
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
-import Sketch from '../../Sketch/Sketch';
-import { SketchFunction } from '../../types/sketch';
+import { SketchObject, SketchClass } from '../../types/sketch';
 
-export default function (this: Sketch): SketchFunction {
-
+export default function (this: SketchClass): SketchObject {
   let cube: THREE.Mesh;
   let lights;
 
   const gui = new dat.GUI();
 
   const vars = {
-      rotation: 0,
+    rotation: 0,
   };
 
   const createCube = function () {
-      const geometry = new THREE.BoxGeometry();
-      const material = new THREE.MeshStandardMaterial( { color: 'hotpink' } );
-      return new THREE.Mesh(geometry, material);  
-  }
-  
+    const geometry = new THREE.BoxGeometry();
+    const material = new THREE.MeshStandardMaterial({ color: 'hotpink' });
+    return new THREE.Mesh(geometry, material);
+  };
+
   const createLights = function () {
-      return {
-          ambient: new THREE.AmbientLight(0xffffff, 0.25),
-          point: new THREE.PointLight(0xffffff, 1.0),
-      }
-  }
+    return {
+      ambient: new THREE.AmbientLight(0xffffff, 0.25),
+      point: new THREE.PointLight(0xffffff, 1.0),
+    };
+  };
 
   const setup = () => {
-      gui.add(vars, 'rotation', 0, Math.PI * 2, 0.001);
-      lights = createLights();
-      lights.point.position.set(2, 2, 2);
-      cube = createCube();
-      this.scene.add(cube, ...Object.values(lights));
+    gui.add(vars, 'rotation', 0, Math.PI * 2, 0.001);
+    lights = createLights();
+    lights.point.position.set(2, 2, 2);
+    cube = createCube();
+    this.scene.add(cube, ...Object.values(lights));
   };
 
   const onFrame = () => {
-      cube.rotation.y = vars.rotation;
+    cube.rotation.y = vars.rotation;
   };
 
   return {
-      setup,
-      onFrame,
-  }
+    setup,
+    onFrame,
+    options: {
+      showStats: true,
+    },
+  };
 }
