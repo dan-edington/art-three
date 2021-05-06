@@ -5,15 +5,14 @@ export default function (this: SketchClass): void {
 
   this.onFrame();
 
-  if (this.orbit) {
-    this.orbit.update();
+  if (this.shouldRender) {
+    this.shouldRender = false;
+    this.renderer.render(this.scene, this.camera);
   }
-
-  this.renderer.render(this.scene, this.camera);
 
   this?.stats?.end();
 
-  requestAnimationFrame(() => {
-    this.tick();
-  });
+  if (!this.options.noAnimation) {
+    requestAnimationFrame(this.tick);
+  }
 }

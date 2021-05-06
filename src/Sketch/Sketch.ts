@@ -9,7 +9,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { SketchOptions, SketchClass, SketchObject } from '../types/sketch';
 class Sketch implements SketchClass {
   start: () => void;
-  setup: () => void;
+  setup: () => void | Promise<any>;
   onFrame: () => void;
   init: () => void;
   tick: () => void;
@@ -18,6 +18,7 @@ class Sketch implements SketchClass {
   camera: THREE.PerspectiveCamera | THREE.OrthographicCamera;
   scene: THREE.Scene;
   clock: THREE.Clock;
+  shouldRender: boolean;
   orbit: OrbitControls;
   stats: Stats | null;
 
@@ -27,6 +28,7 @@ class Sketch implements SketchClass {
     const defaultOptions = {
       useOrbit: true,
       showStats: false,
+      noAnimation: false,
     };
 
     this.options = { ...defaultOptions, ...options };
@@ -40,6 +42,7 @@ class Sketch implements SketchClass {
         document.body.appendChild(this.stats.dom);
       }
 
+      this.shouldRender = true;
       this.scene = new THREE.Scene();
       this.tick = Tick.bind(this);
 

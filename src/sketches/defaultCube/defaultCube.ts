@@ -34,7 +34,10 @@ export default function (this: SketchClass): SketchObject {
   };
 
   const onFrame = () => {
-    cube.rotation.y = vars.rotation;
+    if (cube.rotation.y !== vars.rotation) {
+      cube.rotation.y = vars.rotation;
+      this.shouldRender = true;
+    }
   };
 
   return {
@@ -42,6 +45,7 @@ export default function (this: SketchClass): SketchObject {
     onFrame,
     options: {
       showStats: true,
+      useOrbit: true,
     },
   };
 }

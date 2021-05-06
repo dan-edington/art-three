@@ -12,6 +12,7 @@ export interface SketchClass {
   camera: THREE.PerspectiveCamera | THREE.OrthographicCamera;
   scene: THREE.Scene;
   clock: THREE.Clock;
+  shouldRender: boolean;
   orbit: OrbitControls;
   stats: Stats | null;
 }
@@ -19,6 +20,7 @@ export interface SketchClass {
 export interface SketchOptions {
   useOrbit?: boolean;
   showStats?: boolean;
+  noAnimation?: boolean;
 }
 
 export interface SketchObject {

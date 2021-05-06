@@ -4,9 +4,12 @@ import { SketchClass } from '../types/sketch';
 export default function (this: SketchClass): void {
   this.renderer = new THREE.WebGLRenderer({
     antialias: true,
+    preserveDrawingBuffer: false,
+    powerPreference: 'high-performance',
   });
+  this.renderer.outputEncoding = THREE.sRGBEncoding;
   this.renderer.setSize(window.innerWidth, window.innerHeight);
-  this.renderer.setPixelRatio(window.devicePixelRatio);
+  this.renderer.setPixelRatio(window.devicePixelRatio > 2 ? 2 : window.devicePixelRatio);
   this.renderer.setClearColor(0xc6c6c6);
   document.body.appendChild(this.renderer.domElement);
 }

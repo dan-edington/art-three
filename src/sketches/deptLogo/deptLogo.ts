@@ -37,26 +37,26 @@ export default function (this: SketchClass): SketchObject {
   const createImagePlane = function (): Promise<
     THREE.Mesh<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>
   > {
-    return new Promise<
-      THREE.Mesh<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>
-    >((resolve, reject) => {
-      new THREE.TextureLoader().load(logo, (texture) => {
-        imageWidth = texture.image.width / texture.image.height;
-        const plane = new THREE.PlaneBufferGeometry(imageWidth, 1, 1, 1);
+    return new Promise<THREE.Mesh<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>>(
+      (resolve, reject) => {
+        new THREE.TextureLoader().load(logo, (texture) => {
+          imageWidth = texture.image.width / texture.image.height;
+          const plane = new THREE.PlaneBufferGeometry(imageWidth, 1, 1, 1);
 
-        const planeMaterial = new THREE.ShaderMaterial({
-          uniforms: {
-            uTexture: { value: texture },
-            uProgress: { value: vars.progress },
-          },
-          vertexShader: imagePlaneVert,
-          fragmentShader: imagePlaneFrag,
-          transparent: true,
+          const planeMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+              uTexture: { value: texture },
+              uProgress: { value: vars.progress },
+            },
+            vertexShader: imagePlaneVert,
+            fragmentShader: imagePlaneFrag,
+            transparent: true,
+          });
+
+          resolve(new THREE.Mesh(plane, planeMaterial));
         });
-
-        resolve(new THREE.Mesh(plane, planeMaterial));
-      });
-    });
+      },
+    );
   };
 
   const createParticles = function (): THREE.Points<
@@ -83,6 +83,7 @@ export default function (this: SketchClass): SketchObject {
   const updateUniforms = (): void => {
     imagePlane.material.uniforms.uProgress.value = vars.progress;
     particles.material.uniforms.uProgress.value = vars.progress;
+    this.shouldRender = true;
   };
 
   const setupGUI = (): void => {
