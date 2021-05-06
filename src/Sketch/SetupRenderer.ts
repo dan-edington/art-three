@@ -9,7 +9,7 @@ export default function (this: SketchClass): void {
   });
   this.renderer.outputEncoding = THREE.sRGBEncoding;
   this.renderer.setSize(window.innerWidth, window.innerHeight);
-  this.renderer.setPixelRatio(window.devicePixelRatio > 2 ? 2 : window.devicePixelRatio);
+  this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   this.renderer.setClearColor(0xc6c6c6);
   document.body.appendChild(this.renderer.domElement);
 }
