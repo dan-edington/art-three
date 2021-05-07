@@ -28,7 +28,7 @@ export default function (this: SketchClass): SketchObject {
     };
   };
 
-  const createWheel = (): THREE.Group => {
+  const createWheel = (): [] => {
     const wheel = new THREE.Group();
 
     const material = new THREE.MeshStandardMaterial({ color: 0xaaaaaa });
@@ -47,12 +47,20 @@ export default function (this: SketchClass): SketchObject {
       8,
     );
 
+    const bladeShape = new CANNON.Box(new CANNON.Vec3(0.1, 0.5, 1));
+    const bladeBodies = [];
+
+    for (let i = 0; i < 8; i++) {
+      const bladeBody = new CANNON.Body({ mass: 1, shape: bladeShape });
+      bladeBodies.push(bladeBody);
+    }
+
     blade.rotation.x = Math.PI * 0.5;
     center.rotation.x = Math.PI * 0.5;
     wheel.add(blade);
     wheel.add(center);
 
-    return wheel;
+    return [wheel, { centerBody, bladeBodies }];
   };
 
   const createWall = () => {
@@ -64,7 +72,7 @@ export default function (this: SketchClass): SketchObject {
   const createRandomWheels = (): Wheels[] => {
     const wheels = [];
     for (let i = 0; i < wheelCount; i++) {
-      const wheel = createWheel();
+      const [wheel, wheelBodies] = createWheel();
       const xyPos = new THREE.Vector2(Math.random() * 10 - 5, i * 2 - (wheelCount - 1));
       wheel.scale.set(0.25, 0.25, 0.25);
       wheel.position.set(xyPos.x, xyPos.y, 0);
