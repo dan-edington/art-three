@@ -48,9 +48,9 @@ class Sketch implements SketchClass {
       this.tick = Tick.bind(this);
 
       SetupRenderer.bind(this)();
-      SetupCamera.bind(this)();
       SetupClock.bind(this)();
 
+      SetupCamera.bind(this)();
       this.scene.add(this.camera);
 
       window.addEventListener('resize', ResizeHandler.bind(this));
