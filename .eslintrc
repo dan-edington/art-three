@@ -4,5 +4,8 @@
     "ecmaVersion": 2020,
     "sourceType": "module"
   },
-  "extends": ["plugin:@typescript-eslint/recommended", "prettier"]
+  "extends": ["plugin:@typescript-eslint/recommended", "prettier"],
+  "rules": {
+    "@typescript-eslint/ban-ts-comment": "off"
+  }
 }
