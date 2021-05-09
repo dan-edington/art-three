@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import * as CANNON from 'cannon-es';
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
@@ -21,17 +23,30 @@ export default function (this: SketchClass): SketchObject {
   let balls: Ball[];
   const wheelCount = 5;
   const wheelSides = 8;
-  const dummyMatrix = new THREE.Object3D();
 
   const world = new CANNON.World({
-    gravity: new CANNON.Vec3(0, 9.82, 0), // m/s²
+    gravity: new CANNON.Vec3(0, -9.82, 0), // m/s²
   });
 
+  const syncObjectToPhysics = (obj, obj3d: string, body: string) => {
+    obj[obj3d].position.copy(obj[body].position);
+    obj[obj3d].quaternion.copy(obj[body].quaternion);
+  };
+
+  const syncPhysicsToObject = (obj, obj3d: string, body: string) => {
+    obj[body].position.copy(obj[obj3d].position);
+    obj[body].quaternion.copy(obj[obj3d].quaternion);
+  };
+
   const addLights = (): LightsObject => {
-    return {
-      ambient: new THREE.AmbientLight(0xffffff, 0.5),
-      point: new THREE.PointLight(0xffffff, 1.0),
+    const lights = {
+      //ambient: new THREE.AmbientLight(0xffffff, 0.5),
+      directional: new THREE.DirectionalLight(0xffffff, 1),
     };
+
+    this.scene.add(...Object.values(lights));
+
+    return lights;
   };
 
   const getBladeTransform = (i: number) => {
@@ -90,7 +105,7 @@ export default function (this: SketchClass): SketchObject {
         new CANNON.Quaternion().copy(blade.quaternion),
       );
     }
-
+    wheel.castShadow = true;
     wheel.rotation.x = Math.PI * 0.5;
     wheel.position.set(position.x, position.y, 0);
     // @ts-ignore
@@ -107,7 +122,17 @@ export default function (this: SketchClass): SketchObject {
   const createWall = () => {
     const material = new THREE.MeshStandardMaterial({ color: 0x0000ff });
     const wall = new THREE.Mesh(new THREE.BoxBufferGeometry(10, 10, 1, 1, 1, 1), material);
-    return wall;
+    const wallBody = new CANNON.Body({ mass: 0 });
+    wallBody.addShape(new CANNON.Box(new CANNON.Vec3(5, 5, 0.5)));
+
+    wall.receiveShadow = true;
+
+    this.scene.add(wall);
+
+    return {
+      wall,
+      wallBody,
+    };
   };
 
   const createRandomWheels = () => {
@@ -115,7 +140,8 @@ export default function (this: SketchClass): SketchObject {
 
     for (let i = 0; i < wheelCount; i++) {
       const xyPos = new THREE.Vector2(Math.random() * 10 - 5, i * 2 - (wheelCount - 1));
-      const wheel = createWheel(xyPos, 0.25);
+      const scale = Math.random() * (0.5 - 0.25) + 0.25;
+      const wheel = createWheel(xyPos, scale);
       wheels.push(wheel);
     }
 
@@ -131,6 +157,7 @@ export default function (this: SketchClass): SketchObject {
 
     for (let i = 0; i < 50; i++) {
       const ball = new THREE.Mesh(new THREE.SphereBufferGeometry(radius, 8, 8), material);
+      ball.castShadow = true;
       const ballBody = new CANNON.Body({ mass: 1 });
       ballBody.addShape(ballShape);
       balls.push({
@@ -144,18 +171,25 @@ export default function (this: SketchClass): SketchObject {
 
   const setup = (): void => {
     // override default camera
-    this.camera = new THREE.OrthographicCamera(-5, 5, -5, 5, 1, 200);
-    this.camera.position.set(0, 0, 1);
+    //this.camera = new THREE.OrthographicCamera(-5, 5, -5, 5, 1, 200);
+    this.camera.position.set(0, 0, 10);
 
-    lights = addLights();
-    lights.point.position.set(0, 0, 10);
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
     const wall = createWall();
-    wall.position.z = -0.5;
+    wall.wall.position.z = -0.55;
+    syncPhysicsToObject(wall, 'wall', 'wallBody');
+    console.log(wall.wall.position);
+    console.log(wall.wallBody.position);
+
+    lights = addLights();
+    lights.directional.position.set(0, 0, 10);
+    lights.directional.lookAt(wall.wall.position);
 
     balls = createBalls();
     balls.forEach((b) => {
-      b.ball.position.y = -5;
+      b.ball.position.y = 5;
       b.ball.position.x = Math.random() * 10 - 5;
       // @ts-ignore
       b.ballBody.position.copy(b.ball.position);
@@ -168,8 +202,6 @@ export default function (this: SketchClass): SketchObject {
       this.scene.add(w.wheel);
       world.addBody(w.wheelBody);
     });
-
-    this.scene.add(wall, ...Object.values(lights));
   };
 
   const timeStep = 1 / 60;
@@ -177,26 +209,31 @@ export default function (this: SketchClass): SketchObject {
 
   const onFrame = (): void => {
     const time = performance.now() / 1000; // seconds
+
     if (!lastCallTime) {
       world.step(timeStep);
     } else {
       const dt = time - lastCallTime;
       world.step(timeStep, dt);
     }
+
     lastCallTime = time;
 
     wheels.forEach((w) => {
+      syncObjectToPhysics(w, 'wheel', 'wheelBody');
       // @ts-ignore
-      w.wheel.position.copy(w.wheelBody.position);
-      // @ts-ignore
-      w.wheel.quaternion.copy(w.wheelBody.quaternion);
+      // w.wheel.position.copy(w.wheelBody.position);
+      // // @ts-ignore
+      // w.wheel.quaternion.copy(w.wheelBody.quaternion);
     });
 
     balls.forEach((b) => {
+      syncObjectToPhysics(b, 'ball', 'ballBody');
+
       // @ts-ignore
-      b.ball.position.copy(b.ballBody.position);
-      // @ts-ignore
-      b.ball.quaternion.copy(b.ballBody.quaternion);
+      // b.ball.position.copy(b.ballBody.position);
+      // // @ts-ignore
+      // b.ball.quaternion.copy(b.ballBody.quaternion);
     });
 
     this.shouldRender = true;
