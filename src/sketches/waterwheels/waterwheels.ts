@@ -74,6 +74,9 @@ export default function (this: SketchClass): SketchObject {
     const wheel = new THREE.Group();
     const material = new THREE.MeshStandardMaterial({ color: 0xaaaaaa });
     const wheelBody = new CANNON.Body({ mass: 2 });
+    const wheelBodyMaterial = new CANNON.Material('wheelBody');
+    wheelBodyMaterial.friction = 0.1;
+    wheelBody.material = wheelBodyMaterial;
 
     // center
 
@@ -130,6 +133,9 @@ export default function (this: SketchClass): SketchObject {
     const material = new THREE.MeshStandardMaterial({ color: 0x0000ff });
     const wall = new THREE.Mesh(new THREE.BoxBufferGeometry(10, 10, 1, 1, 1, 1), material);
     const wallBody = new CANNON.Body({ mass: 0 });
+    const wallBodyMaterial = new CANNON.Material('wallBody');
+    wallBodyMaterial.friction = 0.1;
+    wallBody.material = wallBodyMaterial;
     wallBody.addShape(new CANNON.Box(new CANNON.Vec3(5, 5, 0.5)));
 
     this.scene.add(wall);
@@ -157,6 +163,8 @@ export default function (this: SketchClass): SketchObject {
     const radius = 0.05;
     const material = new THREE.MeshStandardMaterial({ color: 0x00ffff });
     const ballShape = new CANNON.Sphere(radius);
+    const bodyMaterial = new CANNON.Material('body');
+    bodyMaterial.friction = 0.1;
 
     const balls = [];
 
@@ -164,6 +172,7 @@ export default function (this: SketchClass): SketchObject {
       const ball = new THREE.Mesh(new THREE.SphereBufferGeometry(radius, 4, 4), material);
 
       const ballBody = new CANNON.Body({ mass: 0.1 });
+      ballBody.material = bodyMaterial;
       ballBody.addShape(ballShape);
       balls.push({
         ball,
