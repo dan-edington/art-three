@@ -22,8 +22,13 @@ export default function (this: SketchClass): SketchObject {
   let wheels: Wheel[];
   let balls: Ball[];
   let wall;
+
   const wheelCount = 5;
+  const ballCount = 100;
   const wheelSides = 8;
+
+  const timeStep = 1 / 60;
+  let lastCallTime: number;
 
   const world = new CANNON.World({
     gravity: new CANNON.Vec3(0, -9.82, 0), // m/s²
@@ -68,7 +73,7 @@ export default function (this: SketchClass): SketchObject {
   const createWheel = (position: THREE.Vector2, scale: number): Wheel => {
     const wheel = new THREE.Group();
     const material = new THREE.MeshStandardMaterial({ color: 0xaaaaaa });
-    const wheelBody = new CANNON.Body({ mass: 1 });
+    const wheelBody = new CANNON.Body({ mass: 2 });
 
     // center
 
@@ -76,7 +81,6 @@ export default function (this: SketchClass): SketchObject {
       new THREE.CylinderBufferGeometry(1 * scale, 1 * scale, 0.5 * scale, wheelSides, 1, false),
       material,
     );
-    center.castShadow = true;
     wheel.add(center);
 
     const centerShape = new CANNON.Cylinder(1 * scale, 1 * scale, 0.5 * scale, wheelSides);
@@ -96,7 +100,7 @@ export default function (this: SketchClass): SketchObject {
       const blade = new THREE.Mesh(bladeGeometry, material);
       blade.position.set(x * scale, 0, y * scale);
       blade.rotation.y = rotationY;
-      blade.castShadow = true;
+
       wheel.add(blade);
 
       const bladeShape = new CANNON.Box(new CANNON.Vec3(0.1 * scale, 0.5 * scale, 1 * scale));
@@ -128,8 +132,6 @@ export default function (this: SketchClass): SketchObject {
     const wallBody = new CANNON.Body({ mass: 0 });
     wallBody.addShape(new CANNON.Box(new CANNON.Vec3(5, 5, 0.5)));
 
-    wall.receiveShadow = true;
-
     this.scene.add(wall);
 
     return {
@@ -158,9 +160,9 @@ export default function (this: SketchClass): SketchObject {
 
     const balls = [];
 
-    for (let i = 0; i < 5; i++) {
-      const ball = new THREE.Mesh(new THREE.SphereBufferGeometry(radius, 8, 8), material);
-      ball.castShadow = true;
+    for (let i = 0; i < ballCount; i++) {
+      const ball = new THREE.Mesh(new THREE.SphereBufferGeometry(radius, 4, 4), material);
+
       const ballBody = new CANNON.Body({ mass: 0.1 });
       ballBody.addShape(ballShape);
       balls.push({
@@ -174,19 +176,21 @@ export default function (this: SketchClass): SketchObject {
 
   const connectWheelsToWall = () => {
     const zero = new CANNON.Vec3();
-    wheels.forEach((w) => {
-      const wheelBody = w.wheelBody;
-      const wallBody = wall.wallBody;
-      const pivotA = w.wheelBody.position;
+    const axisA = new CANNON.Vec3(0, 0, 1);
+    const axisB = new CANNON.Vec3(0, 1, 0);
+
+    for (let i = 0; i < wheels.length; i++) {
+      const wheelBody = wheels[i].wheelBody;
+      const pivotA = wheelBody.position;
       pivotA.z = 0.55;
-      const constraint = new CANNON.HingeConstraint(wallBody, wheelBody, {
-        pivotA,
-        axisA: new CANNON.Vec3(0, 0, 1),
+      const constraint = new CANNON.HingeConstraint(wall.wallBody, wheelBody, {
+        pivotA: wheelBody.position,
+        axisA,
         pivotB: zero,
-        axisB: new CANNON.Vec3(0, 1, 0),
+        axisB,
       });
       world.addConstraint(constraint);
-    });
+    }
   };
 
   const setup = (): void => {
@@ -194,60 +198,58 @@ export default function (this: SketchClass): SketchObject {
     //this.camera = new THREE.OrthographicCamera(-5, 5, -5, 5, 1, 200);
     this.camera.position.set(0, 0, 10);
 
-    this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFShadowMap;
-
     wall = createWall();
     wall.wall.position.z = -0.55;
     syncPhysicsToObject(wall, 'wall', 'wallBody');
 
     lights = addLights();
-    lights.directional.castShadow = true;
     lights.directional.position.set(0, 0, 10);
     lights.directional.lookAt(wall.wall.position);
 
     balls = createBalls();
-    balls.forEach((b) => {
-      b.ball.position.y = 5;
-      b.ball.position.x = Math.random() * 10 - 5;
-      // @ts-ignore
-      b.ballBody.position.copy(b.ball.position);
-      this.scene.add(b.ball);
-      world.addBody(b.ballBody);
-    });
+
+    for (let i = 0; i < balls.length; i++) {
+      balls[i].ball.position.set(5, Math.random() * 10 - 5, 0);
+      balls[i].ballBody.position.copy(balls[i].ball.position);
+      this.scene.add(balls[i].ball);
+      world.addBody(balls[i].ballBody);
+    }
 
     wheels = createRandomWheels();
-    wheels.forEach((w) => {
-      this.scene.add(w.wheel);
-      world.addBody(w.wheelBody);
-    });
+
+    for (let i = 0; i < wheels.length; i++) {
+      this.scene.add(wheels[i].wheel);
+      world.addBody(wheels[i].wheelBody);
+    }
 
     connectWheelsToWall();
   };
 
-  const timeStep = 1 / 60;
-  let lastCallTime: number;
-
   const onFrame = (): void => {
-    const time = performance.now() / 1000; // seconds
+    const time = performance.now() / 1000;
+
     if (!lastCallTime) {
       world.step(timeStep);
     } else {
       const dt = time - lastCallTime;
       world.step(timeStep, dt);
     }
+
     lastCallTime = time;
-    wheels.forEach((w) => {
-      syncObjectToPhysics(w, 'wheel', 'wheelBody');
-    });
-    balls.forEach((b) => {
-      syncObjectToPhysics(b, 'ball', 'ballBody');
-      if (b.ball.position.y < -5) {
-        b.ballBody.position.set(Math.random() * 10 - 5, 5, 0);
-        b.ballBody.velocity.set(0, 0, 0);
-        b.ballBody.angularVelocity.set(0, 0, 0);
+
+    for (let i = 0; i < wheels.length; i++) {
+      syncObjectToPhysics(wheels[i], 'wheel', 'wheelBody');
+    }
+
+    for (let i = 0; i < balls.length; i++) {
+      syncObjectToPhysics(balls[i], 'ball', 'ballBody');
+      if (balls[i].ball.position.y < -5) {
+        balls[i].ballBody.position.set(Math.random() * 10 - 5, 5, 0);
+        balls[i].ballBody.velocity.set(0, 0, 0);
+        balls[i].ballBody.angularVelocity.set(0, 0, 0);
       }
-    });
+    }
+
     this.shouldRender = true;
   };
 
