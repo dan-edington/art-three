@@ -100,7 +100,7 @@ export default function (this: SketchClass): SketchObject {
     });
   };
 
-  const setup = async (): Promise<any> => {
+  const setup = async (): Promise<void> => {
     this.renderer.setClearColor(0x000000);
     imagePlane = await createImagePlane();
     particles = createParticles();

@@ -12,7 +12,7 @@ module.exports = function (plop) {
     actions: [
       {
         type: 'add',
-        path: 'src/sketches/{{kebabCase name}}/{{pascalCase name}}.js',
+        path: 'src/sketches/{{name}}/{{name}}.ts',
         templateFile: 'plop-templates/sketch.hbs',
       },
     ],

@@ -3,7 +3,7 @@ import { SketchClass } from '../types/sketch';
 
 export default function (this: SketchClass): void {
   this.renderer = new THREE.WebGLRenderer({
-    antialias: true,
+    //antialias: true,
     preserveDrawingBuffer: false,
     powerPreference: 'high-performance',
   });

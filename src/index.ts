@@ -1,9 +1,7 @@
+import './index.css';
 import { SketchClass } from './types/sketch';
 import Sketch from './Sketch/Sketch';
-import defaultCube from './sketches/defaultCube/defaultCube';
-//import deptLogo from './sketches/deptLogo/deptLogo';
-import waterwheels from './sketches/waterwheels/waterwheels';
-import './index.css';
+import _sketch from './sketches/doneit/doneit';
 
-const s: SketchClass = new Sketch(waterwheels);
+const s: SketchClass = new Sketch(_sketch);
 s.start();

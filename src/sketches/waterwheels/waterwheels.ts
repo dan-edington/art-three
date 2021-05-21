@@ -24,8 +24,8 @@ export default function (this: SketchClass): SketchObject {
   let wall;
 
   const wheelCount = 5;
-  const ballCount = 100;
-  const wheelSides = 8;
+  const ballCount = 20;
+  const wheelSides = 3;
 
   const timeStep = 1 / 60;
   let lastCallTime: number;
@@ -56,7 +56,24 @@ export default function (this: SketchClass): SketchObject {
     return lights;
   };
 
-  const getBladeTransform = (i: number) => {
+  const createWall = () => {
+    const material = new THREE.MeshStandardMaterial({ color: 0x0000ff });
+    const wall = new THREE.Mesh(new THREE.BoxBufferGeometry(10, 10, 1, 1, 1, 1), material);
+    const wallBody = new CANNON.Body({ mass: 0 });
+    const wallBodyMaterial = new CANNON.Material('wallBody');
+    wallBodyMaterial.friction = 0.1;
+    wallBody.material = wallBodyMaterial;
+    wallBody.addShape(new CANNON.Box(new CANNON.Vec3(5, 5, 0.5)));
+
+    this.scene.add(wall);
+
+    return {
+      wall,
+      wallBody,
+    };
+  };
+
+  const calculateBladeTransform = (i: number) => {
     const ii = i + Math.PI * 0.8;
     const radius = 1.4;
     const step = (Math.PI * 2) / wheelSides;
@@ -99,7 +116,7 @@ export default function (this: SketchClass): SketchObject {
     const bladeGeometry = new THREE.BoxBufferGeometry(0.1 * scale, 0.5 * scale, 1 * scale, 1, 1, 1);
 
     for (let i = 0; i < wheelSides; i++) {
-      const { x, y, rotationY } = getBladeTransform(i);
+      const { x, y, rotationY } = calculateBladeTransform(i);
       const blade = new THREE.Mesh(bladeGeometry, material);
       blade.position.set(x * scale, 0, y * scale);
       blade.rotation.y = rotationY;
@@ -129,23 +146,6 @@ export default function (this: SketchClass): SketchObject {
     };
   };
 
-  const createWall = () => {
-    const material = new THREE.MeshStandardMaterial({ color: 0x0000ff });
-    const wall = new THREE.Mesh(new THREE.BoxBufferGeometry(10, 10, 1, 1, 1, 1), material);
-    const wallBody = new CANNON.Body({ mass: 0 });
-    const wallBodyMaterial = new CANNON.Material('wallBody');
-    wallBodyMaterial.friction = 0.1;
-    wallBody.material = wallBodyMaterial;
-    wallBody.addShape(new CANNON.Box(new CANNON.Vec3(5, 5, 0.5)));
-
-    this.scene.add(wall);
-
-    return {
-      wall,
-      wallBody,
-    };
-  };
-
   const createRandomWheels = () => {
     const wheels = [];
 
@@ -164,7 +164,8 @@ export default function (this: SketchClass): SketchObject {
     const material = new THREE.MeshStandardMaterial({ color: 0x00ffff });
     const ballShape = new CANNON.Sphere(radius);
     const bodyMaterial = new CANNON.Material('body');
-    bodyMaterial.friction = 0.1;
+    bodyMaterial.friction = 10000000;
+    bodyMaterial.restitution = 0.1;
 
     const balls = [];
 
@@ -202,10 +203,13 @@ export default function (this: SketchClass): SketchObject {
     }
   };
 
-  const setup = (): void => {
-    // override default camera
+  const setupCamera = (): void => {
     //this.camera = new THREE.OrthographicCamera(-5, 5, -5, 5, 1, 200);
     this.camera.position.set(0, 0, 10);
+  };
+
+  const setup = (): void => {
+    setupCamera();
 
     wall = createWall();
     wall.wall.position.z = -0.55;
