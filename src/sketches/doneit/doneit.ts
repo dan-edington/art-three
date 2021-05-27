@@ -7,6 +7,8 @@ import { SketchObject, SketchClass } from '../../types/sketch';
 import blobFragment from './shaders/fragment.frag';
 import blobVertex from './shaders/vertex.vert';
 
+import image from './image.png';
+
 export default function (this: SketchClass): SketchObject {
   let blob: THREE.Mesh;
 
@@ -22,6 +24,7 @@ export default function (this: SketchClass): SketchObject {
     const material = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: vars.time },
+        image: {},
       },
       vertexShader: blobVertex,
       fragmentShader: blobFragment,
