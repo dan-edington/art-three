@@ -7,15 +7,13 @@ import { SketchObject, SketchClass } from '../../types/sketch';
 import blobFragment from './shaders/fragment.frag';
 import blobVertex from './shaders/vertex.vert';
 
-import image from './image.png';
-
 export default function (this: SketchClass): SketchObject {
   let blob: THREE.Mesh;
 
   const gui = new dat.GUI();
 
   const vars = {
-    rotation: 0,
+    uImage: null,
     time: 0.0,
   };
 
@@ -24,7 +22,7 @@ export default function (this: SketchClass): SketchObject {
     const material = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: vars.time },
-        image: {},
+        uImage: { value: vars.uImage },
       },
       vertexShader: blobVertex,
       fragmentShader: blobFragment,
@@ -32,7 +30,12 @@ export default function (this: SketchClass): SketchObject {
     return new THREE.Mesh(geometry, material);
   };
 
+  const loadTextures = function () {
+    vars.uImage = new THREE.TextureLoader().load('https://picsum.photos/400');
+  };
+
   const setup = () => {
+    loadTextures();
     blob = createBlob();
     this.scene.add(blob);
   };
