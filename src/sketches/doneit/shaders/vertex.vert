@@ -33,9 +33,10 @@ float snoise(vec2 v){
 }
 
 void main() {
+
   vUv = uv;
   pos = position;
-  float timeSmall = tan(sin(time));
+  float timeSmall = sin(mod(time, 9.));
   vec2 noiseVector = vec2(sin(timeSmall * position.y), cos(timeSmall * position.x));
   vec3 newPos = position + normal * (snoise(noiseVector) * 0.15);
   vec4 modelViewPosition = modelViewMatrix * vec4(newPos, 1.0);
