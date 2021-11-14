@@ -22,10 +22,10 @@ export default function (this: SketchClass): SketchObject {
   };
 
   const params = {
-    exposure: 1,
-    bloomStrength: 1.5,
+    exposure: 20,
+    bloomStrength: 2,
     bloomThreshold: 0,
-    bloomRadius: 0,
+    bloomRadius: 0.5,
   };
 
   const createLights = function () {
@@ -38,7 +38,7 @@ export default function (this: SketchClass): SketchObject {
   const createTores = function () {
     let torus = {};
     for (let i = 0; i < toresCount; i++) {
-      const geometry = new THREE.TorusGeometry(i + 1, 0.1, 16, 128);
+      const geometry = new THREE.TorusGeometry(i + 1, 0.1, 8, 64);
       const material = new THREE.MeshStandardMaterial({
         color: new THREE.Color(),
       });
@@ -54,14 +54,7 @@ export default function (this: SketchClass): SketchObject {
     gui.add(vars, 'radiusMax').min(0.001).max(1).step(0.001);
     gui.add(vars, 'amountScale').min(0.001).max(10).step(0.001);
     gui.add(vars, 'amountAngleScale').min(0.001).max(1).step(0.001);
-    // gui.addColor(palette, 'bgColor').onChange(() => {
-    //   this.renderer.setClearColor(palette.bgColor);
-    // });
-    // gui.addColor(palette, 'ringColor').onChange(() => {
-    //   tores.forEach((t) => {
-    //     t.material.color.set(palette.ringColor);
-    //   });
-    // });
+
     this.renderer.setClearColor(new THREE.Color(0x000000));
     camera = this.camera;
     camera.position.set(0, 0, 15);
@@ -89,11 +82,11 @@ export default function (this: SketchClass): SketchObject {
   const onFrame = () => {
     const currentTime = this.clock.getElapsedTime();
     for (let i = 0; i < tores.length; i++) {
-      const amount = Math.sin(currentTime + (i + 1) * vars.amountAngleScale) * vars.amountScale;
+      const amount = Math.sin(currentTime + i * vars.amountAngleScale) * vars.amountScale;
       tores[i].position.y = amount;
       const amountScaled = amount * vars.radiusMax;
       tores[i].scale.set(amountScaled, amountScaled, amountScaled);
-      tores[i].material.color.setHSL(Math.sin(currentTime) * 0.5 + 0.5, 1, 0.5);
+      tores[i].material.color.setHSL(Math.sin(currentTime) * 0.15 + 0.5, 1, 0.5);
     }
 
     this.shouldRender = true;
@@ -105,7 +98,7 @@ export default function (this: SketchClass): SketchObject {
     setup,
     onFrame,
     options: {
-      showStats: false,
+      showStats: true,
       useOrbit: false,
       disableAutoRender: true,
     },
