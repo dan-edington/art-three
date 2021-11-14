@@ -21,6 +21,7 @@ export interface SketchOptions {
   useOrbit?: boolean;
   showStats?: boolean;
   noAnimation?: boolean;
+  disableAutoRender?: boolean;
 }
 
 export interface SketchObject {

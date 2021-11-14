@@ -7,7 +7,9 @@ export default function (this: SketchClass): void {
 
   if (this.shouldRender) {
     this.shouldRender = false;
-    this.renderer.render(this.scene, this.camera);
+    if (!this.options.disableAutoRender) {
+      this.renderer.render(this.scene, this.camera);
+    }
   }
 
   this?.stats?.end();

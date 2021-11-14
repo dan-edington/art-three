@@ -30,6 +30,7 @@ class Sketch implements SketchClass {
       useOrbit: true,
       showStats: false,
       noAnimation: false,
+      disableAutoRender: false,
     };
 
     this.options = { ...defaultOptions, ...options };
