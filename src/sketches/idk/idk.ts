@@ -1,8 +1,10 @@
 // @ts-nocheck
 
 import * as THREE from 'three';
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 import * as dat from 'dat.gui';
 import { SketchObject, SketchClass } from '../../types/sketch';
@@ -12,7 +14,7 @@ export default function (this: SketchClass): SketchObject {
   let tores: [THREE.Mesh] = [];
   let lights;
   let camera;
-  let renderScene, bloomPass, composer;
+  let renderScene, bloomPass, fxaa, composer;
   const gui = new dat.GUI();
 
   const vars = {
@@ -58,6 +60,7 @@ export default function (this: SketchClass): SketchObject {
     this.renderer.physicallyCorrectLights = true;
     this.renderer.toneMappingExposure = bloomParams.exposure;
     this.renderer.setClearColor(new THREE.Color(0x000000));
+
     camera = this.camera;
     camera.position.set(0, 0, 15);
     lights = createLights();
@@ -76,8 +79,16 @@ export default function (this: SketchClass): SketchObject {
     bloomPass.strength = bloomParams.bloomStrength;
     bloomPass.radius = bloomParams.bloomRadius;
 
+    fxaa = new ShaderPass(FXAAShader);
+    fxaa.uniforms['resolution'].value.set(
+      1 / (window.innerWidth * devicePixelRatio),
+      1 / (window.innerHeight * devicePixelRatio),
+    );
+    fxaa.renderToScreen = true;
+
     composer = new EffectComposer(this.renderer);
     composer.addPass(renderScene);
+    composer.addPass(fxaa);
     composer.addPass(bloomPass);
 
     const bloomFolder = gui.addFolder('Bloom');
