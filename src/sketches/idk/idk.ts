@@ -16,16 +16,19 @@ export default function (this: SketchClass): SketchObject {
   const gui = new dat.GUI();
 
   const vars = {
-    radiusMax: 0.1,
+    radiusScale: 0.1,
     amountScale: 5,
     amountAngleScale: 0.1,
+    startHue: 0.258,
+    hueRange: 0.15,
+    speed: 0.1,
   };
 
-  const params = {
-    exposure: 20,
+  const bloomParams = {
     bloomStrength: 2,
     bloomThreshold: 0,
     bloomRadius: 0.5,
+    exposure: 1.341,
   };
 
   const createLights = function () {
@@ -51,10 +54,9 @@ export default function (this: SketchClass): SketchObject {
   };
 
   const setup = () => {
-    gui.add(vars, 'radiusMax').min(0.001).max(1).step(0.001);
-    gui.add(vars, 'amountScale').min(0.001).max(10).step(0.001);
-    gui.add(vars, 'amountAngleScale').min(0.001).max(1).step(0.001);
-
+    this.renderer.toneMapping = THREE.CineonToneMapping;
+    this.renderer.physicallyCorrectLights = true;
+    this.renderer.toneMappingExposure = bloomParams.exposure;
     this.renderer.setClearColor(new THREE.Color(0x000000));
     camera = this.camera;
     camera.position.set(0, 0, 15);
@@ -70,23 +72,60 @@ export default function (this: SketchClass): SketchObject {
       0.4,
       0.85,
     );
-    bloomPass.threshold = params.bloomThreshold;
-    bloomPass.strength = params.bloomStrength;
-    bloomPass.radius = params.bloomRadius;
+    bloomPass.threshold = bloomParams.bloomThreshold;
+    bloomPass.strength = bloomParams.bloomStrength;
+    bloomPass.radius = bloomParams.bloomRadius;
 
     composer = new EffectComposer(this.renderer);
     composer.addPass(renderScene);
     composer.addPass(bloomPass);
+
+    const bloomFolder = gui.addFolder('Bloom');
+    const settingsFolder = gui.addFolder('Settings');
+    settingsFolder.add(vars, 'radiusScale').min(0.001).max(1).step(0.001);
+    settingsFolder.add(vars, 'amountScale').min(0.001).max(10).step(0.001);
+    settingsFolder.add(vars, 'amountAngleScale').min(0.001).max(1).step(0.001);
+    settingsFolder.add(vars, 'startHue').min(0).max(1).step(0.001);
+    settingsFolder.add(vars, 'hueRange').min(0).max(1).step(0.001);
+    settingsFolder.add(vars, 'speed').min(0).max(3).step(0.001);
+
+    bloomFolder
+      .add(bloomParams, 'exposure')
+      .min(0)
+      .max(4)
+      .step(0.001)
+      .onChange((value) => {
+        this.renderer.toneMappingExposure = Math.pow(value, 4.0);
+      });
+    bloomFolder
+      .add(bloomParams, 'bloomStrength', 0, 10)
+      .step(0.1)
+      .onChange(() => {
+        bloomPass.strength = bloomParams.bloomStrength;
+      });
+    bloomFolder
+      .add(bloomParams, 'bloomThreshold', 0, 1)
+      .step(0.01)
+      .onChange(() => {
+        bloomPass.threshold = bloomParams.bloomThreshold;
+      });
+    bloomFolder
+      .add(bloomParams, 'bloomRadius', 0, 10)
+      .step(0.01)
+      .onChange(() => {
+        bloomPass.radius = bloomParams.bloomRadius;
+      });
   };
 
   const onFrame = () => {
     const currentTime = this.clock.getElapsedTime();
     for (let i = 0; i < tores.length; i++) {
-      const amount = Math.sin(currentTime + i * vars.amountAngleScale) * vars.amountScale;
+      const amount =
+        Math.sin(currentTime * vars.speed + i * vars.amountAngleScale) * vars.amountScale;
       tores[i].position.y = amount;
-      const amountScaled = amount * vars.radiusMax;
+      const amountScaled = amount * vars.radiusScale;
       tores[i].scale.set(amountScaled, amountScaled, amountScaled);
-      tores[i].material.color.setHSL(Math.sin(currentTime) * 0.15 + 0.5, 1, 0.5);
+      tores[i].material.color.setHSL(Math.sin(currentTime) * vars.hueRange + vars.startHue, 1, 0.5);
     }
 
     this.shouldRender = true;
