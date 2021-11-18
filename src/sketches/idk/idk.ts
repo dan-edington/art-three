@@ -9,6 +9,9 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import * as dat from 'dat.gui';
 import { SketchObject, SketchClass } from '../../types/sketch';
 
+import fragmentShader from './fragment.glsl';
+import vertexShader from './vertex.glsl';
+
 export default function (this: SketchClass): SketchObject {
   const toresCount = 16;
   let tores: [THREE.Mesh] = [];
@@ -21,16 +24,17 @@ export default function (this: SketchClass): SketchObject {
     radiusScale: 0.1,
     amountScale: 5,
     amountAngleScale: 0.1,
-    startHue: 0.258,
-    hueRange: 0.15,
-    speed: 0.1,
+    startHue: 0,
+    hueRange: 0.501,
+    speed: 0.808,
+    bgColor: new THREE.Color(0x000000),
   };
 
   const bloomParams = {
-    bloomStrength: 2,
+    bloomStrength: 10,
     bloomThreshold: 0,
-    bloomRadius: 0.5,
-    exposure: 1.341,
+    bloomRadius: 0,
+    exposure: 0.988,
   };
 
   const createLights = function () {
@@ -42,12 +46,23 @@ export default function (this: SketchClass): SketchObject {
 
   const createTores = function () {
     let torus = {};
+
+    const material = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(),
+    });
+
+    // const material = new THREE.ShaderMaterial({
+    //   uniforms: {
+    //     time: { value: 0 },
+    //   },
+    //   vertexShader,
+    //   fragmentShader,
+    // });
+
     for (let i = 0; i < toresCount; i++) {
       const geometry = new THREE.TorusGeometry(i + 1, 0.1, 8, 64);
-      const material = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(),
-      });
-      torus = new THREE.Mesh(geometry, material);
+      // torus = new THREE.Mesh(geometry, material);
+      torus = new THREE.Points(geometry, material);
       torus.rotation.x = Math.PI / 2;
       torus.position.set(0, 0, 0);
       tores.push(torus);
@@ -59,7 +74,7 @@ export default function (this: SketchClass): SketchObject {
     this.renderer.toneMapping = THREE.CineonToneMapping;
     this.renderer.physicallyCorrectLights = true;
     this.renderer.toneMappingExposure = bloomParams.exposure;
-    this.renderer.setClearColor(new THREE.Color(0x000000));
+    this.renderer.setClearColor(vars.bgColor);
 
     camera = this.camera;
     camera.position.set(0, 0, 15);
@@ -99,6 +114,11 @@ export default function (this: SketchClass): SketchObject {
     settingsFolder.add(vars, 'startHue').min(0).max(1).step(0.001);
     settingsFolder.add(vars, 'hueRange').min(0).max(1).step(0.001);
     settingsFolder.add(vars, 'speed').min(0).max(3).step(0.001);
+    settingsFolder.addColor(vars, 'bgColor').onChange((value) => {
+      const c = new THREE.Color(value);
+      console.log(c);
+      this.renderer.setClearColor(c);
+    });
 
     bloomFolder
       .add(bloomParams, 'exposure')
@@ -130,12 +150,14 @@ export default function (this: SketchClass): SketchObject {
 
   const onFrame = () => {
     const currentTime = this.clock.getElapsedTime();
+
     for (let i = 0; i < tores.length; i++) {
       const amount =
         Math.sin(currentTime * vars.speed + i * vars.amountAngleScale) * vars.amountScale;
       tores[i].position.y = amount;
       const amountScaled = amount * vars.radiusScale;
       tores[i].scale.set(amountScaled, amountScaled, amountScaled);
+      // tores[i].material.uniforms.time.value = currentTime;
       tores[i].material.color.setHSL(Math.sin(currentTime) * vars.hueRange + vars.startHue, 1, 0.5);
     }
 
