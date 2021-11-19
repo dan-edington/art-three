@@ -6,15 +6,15 @@ import SetupRenderer from './SetupRenderer';
 import SetupCamera from './SetupCamera';
 import SetupClock from './SetupClock';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { SketchOptions, SketchClass, SketchObject } from '../types/sketch';
+import { SketchThreeOptions, SketchThreeClass, SketchThreeObject } from '../../types/sketchThree';
 
-class Sketch implements SketchClass {
+class Sketch implements SketchThreeClass {
   start: () => void;
   setup: () => void | Promise<any>;
   onFrame: () => void;
   init: () => void;
   tick: () => void;
-  options: SketchOptions;
+  options: SketchThreeOptions;
   renderer: THREE.WebGLRenderer;
   camera: THREE.PerspectiveCamera | THREE.OrthographicCamera;
   scene: THREE.Scene;
@@ -23,7 +23,7 @@ class Sketch implements SketchClass {
   orbit: OrbitControls;
   stats: Stats | null;
 
-  constructor(sketchFn: () => SketchObject) {
+  constructor(sketchFn: () => SketchThreeObject) {
     const { setup, onFrame, options } = sketchFn.bind(this)();
 
     const defaultOptions = {

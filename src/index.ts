@@ -1,7 +1,12 @@
 import './index.css';
-import { SketchClass } from './types/sketch';
-import Sketch from './Sketch/Sketch';
-import _sketch from './sketches/idk/idk';
+import { SketchThreeClass } from './types/sketchThree';
+import SketchThree from './Sketch/threejs/Sketch';
 
-const s: SketchClass = new Sketch(_sketch);
-s.start();
+import art from './sketches/idk/idk';
+
+const { type, artworkFunction } = art();
+
+if (type === 'THREEJS') {
+  const sketch: SketchThreeClass = new SketchThree(artworkFunction);
+  sketch.start();
+}

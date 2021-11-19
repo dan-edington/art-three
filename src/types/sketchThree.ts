@@ -1,13 +1,20 @@
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Stats from 'three/examples/jsm/libs/stats.module';
 
-export interface SketchClass {
+export interface SketchThreeOptions {
+  useOrbit?: boolean;
+  showStats?: boolean;
+  noAnimation?: boolean;
+  disableAutoRender?: boolean;
+}
+
+export interface SketchThreeClass {
   start(): void;
   setup(): void;
   onFrame(): void;
   init(): void;
   tick(): void;
-  options: SketchOptions;
+  options: SketchThreeOptions;
   renderer: THREE.WebGLRenderer;
   camera: THREE.PerspectiveCamera | THREE.OrthographicCamera;
   scene: THREE.Scene;
@@ -17,15 +24,8 @@ export interface SketchClass {
   stats: Stats | null;
 }
 
-export interface SketchOptions {
-  useOrbit?: boolean;
-  showStats?: boolean;
-  noAnimation?: boolean;
-  disableAutoRender?: boolean;
-}
-
-export interface SketchObject {
+export interface SketchThreeObject {
   setup(): void;
   onFrame(): void;
-  options?: SketchOptions;
+  options?: SketchThreeOptions;
 }

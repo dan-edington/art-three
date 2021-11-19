@@ -2,7 +2,8 @@ import * as THREE from 'three';
 import * as dat from 'dat.gui';
 import gsap from 'gsap';
 
-import { SketchObject, SketchClass } from '../../types/sketch';
+import { SketchThreeObject, SketchThreeClass } from '../../types/sketchThree';
+import { Artwork } from '../../types/artwork';
 
 import logo from './deptLogo.png';
 import imagePlaneFrag from './shaders/imagePlane.frag';
@@ -10,7 +11,7 @@ import imagePlaneVert from './shaders/imagePlane.vert';
 import particlesFrag from './shaders/particles.frag';
 import particlesVert from './shaders/particles.vert';
 
-export default function (this: SketchClass): SketchObject {
+function deptLogo(this: SketchThreeClass): SketchThreeObject {
   let gui: dat.GUI;
   let lights;
   let imagePlane: THREE.Mesh<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>;
@@ -122,5 +123,12 @@ export default function (this: SketchClass): SketchObject {
       useOrbit: false,
       showStats: true,
     },
+  };
+}
+
+export default function (): Artwork {
+  return {
+    type: 'THREEJS',
+    artworkFunction: deptLogo,
   };
 }

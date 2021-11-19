@@ -1,14 +1,15 @@
 // @ts-nocheck
 
 import * as THREE from 'three';
-import { SketchObject, SketchClass } from '../../types/sketch';
+import { SketchThreeObject, SketchThreeClass } from '../../types/sketchThree';
+import { Artwork } from '../../types/artwork';
 
 import frag from './fragment.frag';
 import vert from './vertex.vert';
 
 import vertnoise from './verticalnoise.jpg';
 
-export default function (this: SketchClass): SketchObject {
+function cookie(this: SketchThreeClass): SketchThreeObject {
   let cookie: THREE.Mesh;
 
   const vars = {
@@ -47,5 +48,12 @@ export default function (this: SketchClass): SketchObject {
       showStats: false,
       useOrbit: true,
     },
+  };
+}
+
+export default function (): Artwork {
+  return {
+    type: 'THREEJS',
+    artworkFunction: cookie,
   };
 }

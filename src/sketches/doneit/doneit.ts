@@ -2,12 +2,13 @@
 
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
-import { SketchObject, SketchClass } from '../../types/sketch';
+import { SketchThreeObject, SketchThreeClass } from '../../types/sketchThree';
+import { Artwork } from '../../types/artwork';
 
 import blobFragment from './shaders/fragment.frag';
 import blobVertex from './shaders/vertex.vert';
 
-export default function (this: SketchClass): SketchObject {
+function doneit(this: SketchThreeClass): SketchThreeObject {
   let blob: THREE.Mesh;
 
   const gui = new dat.GUI();
@@ -54,5 +55,12 @@ export default function (this: SketchClass): SketchObject {
       showStats: false,
       useOrbit: true,
     },
+  };
+}
+
+export default function (): Artwork {
+  return {
+    type: 'THREEJS',
+    artworkFunction: doneit,
   };
 }

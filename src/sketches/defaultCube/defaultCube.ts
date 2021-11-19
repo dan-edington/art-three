@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
-import { SketchObject, SketchClass } from '../../types/sketch';
+import { SketchThreeObject, SketchThreeClass } from '../../types/sketchThree';
+import { Artwork } from '../../types/artwork';
 
-export default function (this: SketchClass): SketchObject {
+function defaultCube(this: SketchThreeClass): SketchThreeObject {
   let cube: THREE.Mesh;
   let lights;
 
@@ -47,5 +48,12 @@ export default function (this: SketchClass): SketchObject {
       showStats: true,
       useOrbit: true,
     },
+  };
+}
+
+export default function (): Artwork {
+  return {
+    type: 'THREEJS',
+    artworkFunction: defaultCube,
   };
 }

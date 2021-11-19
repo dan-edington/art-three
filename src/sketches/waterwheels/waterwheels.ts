@@ -3,7 +3,8 @@
 import * as CANNON from 'cannon-es';
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
-import { SketchObject, SketchClass } from '../../types/sketch';
+import { SketchThreeObject, SketchThreeClass } from '../../types/sketchThree';
+import { Artwork } from '../../types/artwork';
 
 interface Wheel {
   wheel: THREE.Group;
@@ -17,7 +18,7 @@ interface LightsObject {
   [key: string]: THREE.Light;
 }
 
-export default function (this: SketchClass): SketchObject {
+function waterwheels(this: SketchThreeClass): SketchThreeObject {
   let lights: LightsObject;
   let wheels: Wheel[];
   let balls: Ball[];
@@ -269,5 +270,12 @@ export default function (this: SketchClass): SketchObject {
   return {
     onFrame,
     setup,
+  };
+}
+
+export default function (): Artwork {
+  return {
+    type: 'THREEJS',
+    artworkFunction: waterwheels,
   };
 }

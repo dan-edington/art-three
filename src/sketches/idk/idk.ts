@@ -1,4 +1,4 @@
-// @ts-nocheck
+//@ts-nocheck
 
 import * as THREE from 'three';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
@@ -7,12 +7,13 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 import * as dat from 'dat.gui';
-import { SketchObject, SketchClass } from '../../types/sketch';
+import { SketchThreeObject, SketchThreeClass } from '../../types/sketchThree';
+import { Artwork } from '../../types/artwork';
 
 import fragmentShader from './fragment.glsl';
 import vertexShader from './vertex.glsl';
 
-export default function (this: SketchClass): SketchObject {
+function idk(this: SketchThreeClass): SketchThreeObject {
   const toresCount = 16;
   let tores: [THREE.Mesh] = [];
   let lights;
@@ -174,5 +175,12 @@ export default function (this: SketchClass): SketchObject {
       useOrbit: false,
       disableAutoRender: true,
     },
+  };
+}
+
+export default function (): Artwork {
+  return {
+    type: 'THREEJS',
+    artworkFunction: idk,
   };
 }
