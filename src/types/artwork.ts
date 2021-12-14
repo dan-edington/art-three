@@ -1,9 +1,8 @@
-import { SketchThreeObject } from './sketchThree';
-import { SketchP5Object } from './sketchP5';
+import P5 from 'p5';
 
 export type ArtworkType = 'THREEJS' | 'P5JS';
 
-export type Artwork = {
-  artworkFunction(): SketchThreeObject | SketchP5Object;
+export type Artwork<T> = {
   type: ArtworkType;
+  artworkFunction: (p5?: P5) => T;
 };

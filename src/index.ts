@@ -1,12 +1,15 @@
 import './index.css';
-import { SketchThreeClass } from './types/sketchThree';
+import { Artwork } from './types/artwork';
 import SketchThree from './Sketch/threejs/Sketch';
+import SketchP5 from './Sketch/p5js/Sketch';
 
-import art from './sketches/idk/idk';
+import art from './sketches/waterwheels/waterwheels';
 
-const { type, artworkFunction } = art();
+const { type, artworkFunction } = art() as Artwork<any>;
 
 if (type === 'THREEJS') {
-  const sketch: SketchThreeClass = new SketchThree(artworkFunction);
+  const sketch = new SketchThree(artworkFunction);
   sketch.start();
+} else if (type === 'P5JS') {
+  const sketch = new SketchP5(artworkFunction);
 }

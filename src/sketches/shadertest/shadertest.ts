@@ -1,9 +1,12 @@
+// @ts-nocheck
+
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
+
 import { SketchThreeObject, SketchThreeClass } from '../../types/sketchThree';
 import { Artwork } from '../../types/artwork';
 
-function defaultCube(this: SketchThreeClass): SketchThreeObject {
+function artwork (this: SketchThreeClass): SketchThreeObject {
   let cube: THREE.Mesh;
   let lights;
 
@@ -51,9 +54,9 @@ function defaultCube(this: SketchThreeClass): SketchThreeObject {
   };
 }
 
-export default function (): Artwork<SketchThreeObject> {
+export default function (): Artwork {
   return {
     type: 'THREEJS',
-    artworkFunction: defaultCube,
+    artworkFunction: artwork,
   };
 }
