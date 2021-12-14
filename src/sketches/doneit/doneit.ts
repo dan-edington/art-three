@@ -58,7 +58,7 @@ function doneit(this: SketchThreeClass): SketchThreeObject {
   };
 }
 
-export default function (): Artwork {
+export default function (): Artwork<SketchThreeObject> {
   return {
     type: 'THREEJS',
     artworkFunction: doneit,

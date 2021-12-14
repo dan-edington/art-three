@@ -1,0 +1,20 @@
+// @ts-nocheck
+
+import P5 from 'p5';
+import { Artwork } from '../../types/artwork';
+
+function artwork(p5: P5): void {
+
+  p5.setup = function () {
+  };
+
+  p5.draw = function () {
+  };
+}
+
+export default function (): Artwork {
+  return {
+    type: 'P5JS',
+    artworkFunction: artwork,
+  };
+}
