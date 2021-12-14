@@ -1,9 +1,9 @@
+import P5 from 'p5';
 import { SketchThreeObject } from './sketchThree';
-import { SketchP5Object } from './sketchP5';
 
 export type ArtworkType = 'THREEJS' | 'P5JS';
 
 export type Artwork = {
-  artworkFunction(): SketchThreeObject | SketchP5Object;
+  artworkFunction(): SketchThreeObject | ((p5: P5) => void);
   type: ArtworkType;
 };
