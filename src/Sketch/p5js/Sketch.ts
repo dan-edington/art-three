@@ -12,7 +12,7 @@ class SketchP5 implements SketchP5Class {
 
   generateDOM(): HTMLElement {
     const sketchP5Container = document.createElement('div');
-    sketchP5Container.setAttribute('id', 'sketch');
+    sketchP5Container.setAttribute('id', 'p5Sketch');
     document.body.appendChild(sketchP5Container);
     return sketchP5Container;
   }
