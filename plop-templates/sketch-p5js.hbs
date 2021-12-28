@@ -1,7 +1,6 @@
-// @ts-nocheck
-
 import P5 from 'p5';
 import { Artwork } from '../../types/artwork';
+import { SketchP5Object } from '../../types/sketchP5';
 
 function artwork(p5: P5): void {
 
@@ -19,7 +18,7 @@ function artwork(p5: P5): void {
   };
 }
 
-export default function (): Artwork {
+export default function (): Artwork<SketchP5Object> {
   return {
     type: 'P5JS',
     artworkFunction: artwork,
