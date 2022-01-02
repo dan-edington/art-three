@@ -85,3 +85,10 @@ body {
   place-items: center;
   height: 100%;
 }
+
+#threeSketch {
+  background-color: #666;
+  display: grid;
+  place-items: center;
+  height: 100%;
+}

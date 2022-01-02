@@ -7,9 +7,19 @@ export default function (this: SketchThreeClass): void {
     preserveDrawingBuffer: false,
     powerPreference: 'high-performance',
   });
+  this.renderer.domElement.setAttribute('id', 'sketch-three-canvas');
+
+  const containerElement = document.createElement('div');
+  containerElement.id = 'threeSketch';
+  document.body.appendChild(containerElement);
+  containerElement.appendChild(this.renderer.domElement);
+
   this.renderer.outputEncoding = THREE.sRGBEncoding;
-  this.renderer.setSize(window.innerWidth, window.innerHeight);
+  if (this.options.dimensions) {
+    this.renderer.setSize(this.options.dimensions.width, this.options.dimensions.height);
+  } else {
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+  }
   this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   this.renderer.setClearColor(0xc6c6c6);
-  document.body.appendChild(this.renderer.domElement);
 }

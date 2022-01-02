@@ -6,6 +6,10 @@ export interface SketchThreeOptions {
   showStats?: boolean;
   noAnimation?: boolean;
   disableAutoRender?: boolean;
+  dimensions?: {
+    width: number;
+    height: number;
+  };
 }
 
 export interface SketchThreeClass {

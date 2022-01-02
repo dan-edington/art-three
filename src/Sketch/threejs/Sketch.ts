@@ -31,6 +31,10 @@ class Sketch implements SketchThreeClass {
       showStats: false,
       noAnimation: false,
       disableAutoRender: false,
+      dimensions: {
+        width: 200,
+        height: 500,
+      },
     };
 
     this.options = { ...defaultOptions, ...options };
