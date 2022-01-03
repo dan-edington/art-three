@@ -80,7 +80,7 @@ const fragShader = `
 
 
     // get dithering threshold
-    float ttt = 8.0;
+    float ttt = 4.0;
     int x = int(mod(fragPos.x, ttt));
     int y = int(mod(fragPos.y, ttt));
 
