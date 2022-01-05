@@ -8,8 +8,7 @@ function artwork(p5: P5): void {
   const particles = [];
   const flowField = [];
   const particleCount = 100;
-  let col;
-  let row;
+  let cols, rows;
 
   class Particle {
     constructor(x: number, y: number) {
@@ -20,6 +19,7 @@ function artwork(p5: P5): void {
 
     update() {
       this.vel.add(this.acc);
+      this.vel.limit(4);
       this.pos.add(this.vel);
       this.acc.mult(0);
     }
@@ -45,7 +45,7 @@ function artwork(p5: P5): void {
     follow() {
       const x = Math.floor(this.pos.x / scale);
       const y = Math.floor(this.pos.y / scale);
-      const index = x + y * 80;
+      const index = x + y * cols;
       const force = flowField[index];
       this.applyForce(force);
     }
@@ -61,6 +61,7 @@ function artwork(p5: P5): void {
     for (let x = 0; x < p5.width; x += scale) {
       for (let y = 0; y < p5.height; y += scale) {
         const a = P5.Vector.fromAngle(p5.noise(x * 0.0186, y * 0.0134) * p5.TWO_PI);
+        a.setMag(0.1);
         flowField.push(a);
       }
     }
@@ -74,6 +75,8 @@ function artwork(p5: P5): void {
       particles.push(p);
     }
     generateFF();
+    cols = Math.floor(p5.width / scale);
+    rows = Math.floor(p5.height / scale);
   };
 
   p5.draw = function () {
