@@ -5,16 +5,36 @@ import { SketchP5Object } from '../../types/sketchP5';
 
 function artwork(p5: P5): void {
   const scale = 10;
+  const particleCount = p5.random(5, 10);
   const particles = [];
   const flowField = [];
-  const particleCount = 100;
-  let cols, rows;
+  let cols;
+  const framesToRender = 600;
+
+  const strokeColors = [
+    '7BA9BF',
+    'F7B1A1',
+    'FBBC18',
+    '543E2E',
+    '28A791',
+    'DB5054',
+    '1E3359',
+    'B8D9CD',
+    'E57C33',
+    'DFD7C5',
+    'D02B2F',
+    '3B2B20',
+  ];
 
   class Particle {
     constructor(x: number, y: number) {
+      this.lifeTime = p5.random(25, framesToRender);
       this.pos = p5.createVector(x, y);
+      this.strokeWeight = Math.floor(p5.random(5, 40));
+      this.prevPos = this.pos.copy();
       this.acc = p5.createVector(0, 0);
       this.vel = p5.createVector(0, 0);
+      this.strokeColor = strokeColors[Math.floor(p5.random(0, strokeColors.length - 1))];
     }
 
     update() {
@@ -24,21 +44,30 @@ function artwork(p5: P5): void {
       this.acc.mult(0);
     }
 
-    applyForce(force: P5.Vector) {
+    applyForce(force) {
       this.acc.add(force);
+    }
+
+    updatePrevPos() {
+      this.prevPos = this.pos.copy();
     }
 
     checkEdges() {
       if (this.pos.x > p5.width) {
         this.pos.x = 0;
-      } else if (this.pos.x < 0) {
-        this.pos.x = p5.width;
+        this.updatePrevPos();
       }
-
+      if (this.pos.x < 0) {
+        this.pos.x = p5.width;
+        this.updatePrevPos();
+      }
       if (this.pos.y > p5.height) {
         this.pos.y = 0;
-      } else if (this.pos.y < 0) {
+        this.updatePrevPos();
+      }
+      if (this.pos.y < 0) {
         this.pos.y = p5.height;
+        this.updatePrevPos();
       }
     }
 
@@ -51,43 +80,61 @@ function artwork(p5: P5): void {
     }
 
     draw() {
-      p5.noStroke();
-      p5.fill(255);
-      p5.circle(this.pos.x, this.pos.y, 5);
+      if (this.lifeTime <= 0) {
+        return;
+      }
+
+      p5.noFill();
+      p5.strokeCap(p5.PROJECT);
+      p5.strokeJoin(p5.MITER);
+      p5.strokeWeight(this.strokeWeight);
+      p5.stroke(`#${this.strokeColor}`);
+      p5.line(this.pos.x, this.pos.y, this.prevPos.x, this.prevPos.y);
+      this.updatePrevPos();
+      this.lifeTime--;
     }
   }
 
   const generateFF = () => {
+    const inc = p5.random(0.001, 0.0001);
+    let xOff = p5.random(0, 100);
+    let yOff = p5.random(0, 100);
+    let zOff = p5.random(0, 100);
     for (let x = 0; x < p5.width; x += scale) {
       for (let y = 0; y < p5.height; y += scale) {
-        const a = P5.Vector.fromAngle(p5.noise(x * 0.0186, y * 0.0134) * p5.TWO_PI);
-        a.setMag(0.1);
+        const a = P5.Vector.fromAngle(p5.noise(xOff, yOff, zOff) * p5.TWO_PI);
+        a.setMag(0.01);
         flowField.push(a);
+        xOff += inc;
       }
+      yOff += inc;
+      zOff += inc;
     }
   };
 
   p5.setup = function () {
-    // p5.noLoop();
-    p5.createCanvas(800, 800);
+    p5.noLoop();
+    p5.createCanvas(600, 600);
+    p5.pixelDensity(2);
     for (let i = 0; i < particleCount; i++) {
       const p = new Particle(p5.random(0, p5.width), p5.random(0, p5.height));
       particles.push(p);
     }
     generateFF();
     cols = Math.floor(p5.width / scale);
-    rows = Math.floor(p5.height / scale);
+    p5.background('#EBE4D8');
   };
 
   p5.draw = function () {
-    p5.background(0);
     const l = particles.length;
-    for (let i = 0; i < l; i++) {
-      const p = particles[i];
-      p.follow();
-      p.update();
-      p.checkEdges();
-      p.draw();
+    for (let i = 0; i < framesToRender; i++) {
+      for (let j = 0; j < l; j++) {
+        const p = particles[j];
+        p.follow();
+        p.update();
+        p.checkEdges();
+        p.draw();
+      }
     }
   };
 }
