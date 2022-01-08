@@ -9,7 +9,7 @@ export interface SketchThreeOptions {
   dimensions?: {
     width: number;
     height: number;
-  };
+  } | null;
 }
 
 export interface SketchThreeClass {

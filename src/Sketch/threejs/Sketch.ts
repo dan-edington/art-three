@@ -26,15 +26,12 @@ class Sketch implements SketchThreeClass {
   constructor(sketchFn: () => SketchThreeObject) {
     const { setup, onFrame, options } = sketchFn.bind(this)();
 
-    const defaultOptions = {
+    const defaultOptions: SketchThreeOptions = {
       useOrbit: true,
       showStats: false,
       noAnimation: false,
       disableAutoRender: false,
-      dimensions: {
-        width: 200,
-        height: 500,
-      },
+      dimensions: null,
     };
 
     this.options = { ...defaultOptions, ...options };
