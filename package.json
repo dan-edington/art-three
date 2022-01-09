@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "cannon-es": "^0.17.0",
+    "canvas-capture": "^1.0.10",
     "dat.gui": "^0.7.7",
     "gsap": "^3.6.1",
     "p5": "^1.4.0",
