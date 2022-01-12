@@ -11,6 +11,10 @@ module.exports = merge(commonConfiguration, {
   mode: 'development',
   devServer: {
     host: '0.0.0.0',
+    headers: {
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+      'Cross-Origin-Opener-Policy': 'same-origin',
+    },
     port: portFinderSync.getPort(8080),
     contentBase: './dist',
     watchContentBase: true,
@@ -28,11 +32,7 @@ module.exports = merge(commonConfiguration, {
       const domain1 = `http${https}://${localIp}:${port}`;
       const domain2 = `http${https}://localhost:${port}`;
 
-      console.log(
-        `Project running at:\n  - ${infoColor(domain1)}\n  - ${infoColor(
-          domain2,
-        )}`,
-      );
+      console.log(`Project running at:\n  - ${infoColor(domain1)}\n  - ${infoColor(domain2)}`);
     },
   },
 });
