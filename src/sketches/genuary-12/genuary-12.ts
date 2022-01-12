@@ -1,6 +1,6 @@
 //@ts-nocheck
 import * as THREE from 'three';
-import * as dat from 'dat.gui';
+import * as CanvasCapture from 'canvas-capture';
 import { SketchThreeObject, SketchThreeClass } from '../../types/sketchThree';
 import { Artwork } from '../../types/artwork';
 
@@ -9,44 +9,37 @@ const randomBetween = (min: number, max: number) => Math.random() * (max - min) 
 function artwork(this: SketchThreeClass): SketchThreeObject {
   let lights;
   const spheres = [];
+  let nextAnimationIndex = 0;
   let sphereMesh;
   const meshDetail = 16;
   const area = 50;
   const shadowMapSize = 2048;
   const shadowNormalBias = 0.001;
   const shadowNear = 100;
-  const shadowFar = 1000;
+  const shadowFar = 2000;
+  let timer = 0;
+  let stopped = false;
+
   const sphereCount = Math.floor(randomBetween(500, 1000));
 
-  const gui = new dat.GUI();
+  const generateSphereColor = () => {
+    const h = Math.floor(randomBetween(0, 360));
+    const s = Math.floor(randomBetween(50, 100));
+    const l = Math.floor(randomBetween(50, 100));
+    return `hsl(${h}, ${s}%, ${l}%)`;
+  };
 
-  const vars = {
-    bgColor: 0x191919,
-    materialColor: 0xff0000,
-    ambient: {
-      color: 0xffffff,
-      intensity: 0.5,
-    },
-    point1: {
-      x: -200,
-      y: 164,
-      z: -200,
-      color: 0xffffff,
-      intensity: 100000,
-    },
-    point2: {
-      x: 200,
-      y: 106,
-      z: 200,
-      color: 0xffffff,
-      intensity: 13682,
-    },
+  const generateBackgroundColor = () => {
+    const h = Math.floor(randomBetween(0, 360));
+    const s = 50;
+    const l = 50;
+    return `hsl(${h}, ${s}%, ${l}%)`;
   };
 
   const sphereGeometry = new THREE.SphereGeometry(1, meshDetail, meshDetail);
   const sphereMaterial = new THREE.MeshPhysicalMaterial({
     transparent: true,
-    color: vars.materialColor,
+    color: new THREE.Color(generateSphereColor()),
     metalness: 0.2,
     roughness: 0.2,
     transmission: 0.5,
@@ -61,6 +54,7 @@ function artwork(this: SketchThreeClass): SketchThreeObject {
       this.radius = 0.01;
       this.startRadius = 0.01;
       this.growing = true;
+      this.animationProgress = 0;
     }
 
     grow() {
@@ -93,14 +87,48 @@ function artwork(this: SketchThreeClass): SketchThreeObject {
         this.growing = false;
       }
     }
+
+    updateAnimation(index) {
+      const dummy = new THREE.Object3D();
+
+      if (this.animationProgress >= 1) {
+        return;
+      }
+      const newPos = this.pos.clone().multiplyScalar(this.animationProgress);
+
+      dummy.position.set(newPos.x, newPos.y, newPos.z);
+      dummy.scale.set(
+        this.radius * this.animationProgress,
+        this.radius * this.animationProgress,
+        this.radius * this.animationProgress,
+      );
+      dummy.updateMatrix();
+      sphereMesh.setMatrixAt(index, dummy.matrix);
+      this.animationProgress += 0.01;
+    }
   }
 
   const createLights = () => {
-    this.renderer.physicallyCorrectLights = true;
-    this.renderer.toneMapping = THREE.CineonToneMapping;
-    this.renderer.outputEncoding = THREE.sRGBEncoding;
-    this.renderer.shadowMap.enabled = true;
-    // this.renderer.shadowMap.type = THREE.VSMShadowMap;
+    const vars = {
+      ambient: {
+        color: 0xffffff,
+        intensity: 0.5,
+      },
+      point1: {
+        x: -200,
+        y: 164,
+        z: -200,
+        color: 0xffffff,
+        intensity: 100000,
+      },
+      point2: {
+        x: 200,
+        y: 106,
+        z: 200,
+        color: 0xffffff,
+        intensity: 13682,
+      },
+    };
 
     const ambient = new THREE.AmbientLight(vars.ambient.color, vars.ambient.intensity);
     const point1 = new THREE.PointLight(vars.point1.color, vars.point1.intensity, 0, 2);
@@ -161,100 +189,90 @@ function artwork(this: SketchThreeClass): SketchThreeObject {
       sphere.grow();
       spheres.push(sphere);
     }
+    spheres.sort((a, b) => b.radius - a.radius);
   };
 
-  const setSpherePositions = () => {
+  const setupSphereMesh = () => {
     const dummy = new THREE.Object3D();
-
+    sphereMesh = new THREE.InstancedMesh(sphereGeometry, sphereMaterial, spheres.length);
+    sphereMesh.castShadow = true;
+    sphereMesh.receiveShadow = true;
     const l = spheres.length;
     for (let i = 0; i < l; i++) {
-      dummy.position.set(spheres[i].pos.x, spheres[i].pos.y, spheres[i].pos.z);
-      dummy.scale.set(spheres[i].radius, spheres[i].radius, spheres[i].radius);
+      dummy.position.set(0, 0, 0);
+      dummy.scale.set(0, 0, 0);
       dummy.updateMatrix();
       sphereMesh.setMatrixAt(i, dummy.matrix);
     }
     sphereMesh.instanceMatrix.needsUpdate = true;
   };
 
-  const setupGUI = () => {
-    gui.addColor(vars, 'bgColor').onChange(() => {
-      this.renderer.setClearColor(vars.bgColor);
-    });
+  const positionCamera = () => {
+    this.camera.position.z = area * 2.5;
+    this.camera.position.y = 75;
+    this.camera.lookAt(0, 0, 0);
+    this.camera.near = 1;
+    this.camera.far = 10;
+  };
 
-    gui.addColor(vars, 'materialColor').onChange(() => {
-      sphereMaterial.color = new THREE.Color(vars.materialColor);
-    });
-
-    const ambientFolder = gui.addFolder('Ambient');
-    const point1Folder = gui.addFolder('Point 1');
-    const point2Folder = gui.addFolder('Point 2');
-
-    const area = 200;
-
-    ambientFolder.addColor(vars.ambient, 'color').onChange(() => {
-      lights.ambient.color = vars.ambient.color;
-    });
-    ambientFolder.add(vars.ambient, 'intensity', 0, 1000000).onChange(() => {
-      lights.ambient.intensity = vars.ambient.intensity;
-    });
-
-    point1Folder.addColor(vars.point1, 'color').onChange(() => {
-      lights.point1.color = vars.point1.color;
-    });
-    point1Folder.add(vars.point1, 'intensity', 0, 1000000).onChange(() => {
-      lights.point1.intensity = vars.point1.intensity;
-    });
-    point1Folder.add(vars.point1, 'x', -area, area).onChange(() => {
-      lights.point1.position.x = vars.point1.x;
-    });
-    point1Folder.add(vars.point1, 'y', -area, area).onChange(() => {
-      lights.point1.position.y = vars.point1.y;
-    });
-    point1Folder.add(vars.point1, 'z', -area, area).onChange(() => {
-      lights.point1.position.z = vars.point1.z;
-    });
-
-    point2Folder.addColor(vars.point2, 'color').onChange(() => {
-      lights.point2.color = vars.point2.color;
-    });
-    point2Folder.add(vars.point2, 'intensity', 0, 1000000).onChange(() => {
-      lights.point2.intensity = vars.point2.intensity;
-    });
-    point2Folder.add(vars.point2, 'x', -area, area).onChange(() => {
-      lights.point2.position.x = vars.point2.x;
-    });
-    point2Folder.add(vars.point2, 'y', -area, area).onChange(() => {
-      lights.point2.position.y = vars.point2.y;
-    });
-    point2Folder.add(vars.point2, 'z', -area, area).onChange(() => {
-      lights.point2.position.z = vars.point2.z;
-    });
+  const setupRenderer = () => {
+    this.renderer.physicallyCorrectLights = true;
+    this.renderer.toneMapping = THREE.CineonToneMapping;
+    this.renderer.outputEncoding = THREE.sRGBEncoding;
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.setClearColor(generateBackgroundColor());
   };
 
   const setup = () => {
-    setupGUI();
-    this.renderer.setClearColor(vars.bgColor);
+    setupRenderer();
     lights = createLights();
+    positionCamera();
     generateSpheres();
-    sphereMesh = new THREE.InstancedMesh(sphereGeometry, sphereMaterial, spheres.length);
-    sphereMesh.castShadow = true;
-    sphereMesh.receiveShadow = true;
+    setupSphereMesh();
     this.scene.add(sphereMesh, ...Object.values(lights));
-    setSpherePositions();
-    this.camera.position.z = area * 3;
+    CanvasCapture.init(this.renderer.domElement);
   };
 
   const onFrame = () => {
+    CanvasCapture.beginVideoRecord({ fps: 60, format: 'mp4', quality: 1.0 });
+
     this.shouldRender = true;
     sphereMesh.rotation.y += 0.01;
+    const timeFloored = Math.floor(this.clock.getElapsedTime()) % 30;
+
+    for (let i = 0; i < nextAnimationIndex; i++) {
+      spheres[i].updateAnimation(i);
+    }
+
+    sphereMesh.instanceMatrix.needsUpdate = true;
+
+    if (timer >= 2 && timeFloored >= 1 && nextAnimationIndex < spheres.length) {
+      nextAnimationIndex++;
+      timer = 0;
+    }
+
+    timer++;
+
+    if (!stopped) {
+      CanvasCapture.recordFrame();
+    }
+
+    if (this.clock.getElapsedTime() >= 2 && !stopped) {
+      stopped = true;
+      CanvasCapture.stopRecord();
+    }
   };
 
   return {
     setup,
     onFrame,
     options: {
-      showStats: true,
-      useOrbit: true,
+      showStats: false,
+      useOrbit: false,
+      dimensions: {
+        width: 800,
+        height: 800,
+      },
     },
   };
 }
