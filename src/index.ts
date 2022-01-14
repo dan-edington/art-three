@@ -3,7 +3,7 @@ import { Artwork } from './types/artwork';
 import SketchThree from './Sketch/threejs/Sketch';
 import SketchP5 from './Sketch/p5js/Sketch';
 
-import art from './sketches/genuary-13/genuary-13';
+import art from './sketches/genuary-14/genuary-14';
 
 const { type, artworkFunction } = art() as Artwork<any>;
 
