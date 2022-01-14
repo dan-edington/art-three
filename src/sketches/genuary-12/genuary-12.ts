@@ -1,6 +1,6 @@
 //@ts-nocheck
 import * as THREE from 'three';
-import * as CanvasCapture from 'canvas-capture';
+// import * as CanvasCapture from 'canvas-capture';
 import { SketchThreeObject, SketchThreeClass } from '../../types/sketchThree';
 import { Artwork } from '../../types/artwork';
 
@@ -18,7 +18,7 @@ function artwork(this: SketchThreeClass): SketchThreeObject {
   const shadowNear = 100;
   const shadowFar = 2000;
   let timer = 0;
-  let stopped = false;
+  // let stopped = false;
 
   const sphereCount = Math.floor(randomBetween(500, 1000));
 
@@ -230,12 +230,11 @@ function artwork(this: SketchThreeClass): SketchThreeObject {
     generateSpheres();
     setupSphereMesh();
     this.scene.add(sphereMesh, ...Object.values(lights));
-    CanvasCapture.init(this.renderer.domElement);
+    // CanvasCapture.init(this.renderer.domElement);
+    // CanvasCapture.beginVideoRecord({ fps: 60, format: 'mp4', quality: 1.0 });
   };
 
   const onFrame = () => {
-    CanvasCapture.beginVideoRecord({ fps: 60, format: 'mp4', quality: 1.0 });
-
     this.shouldRender = true;
     sphereMesh.rotation.y += 0.01;
     const timeFloored = Math.floor(this.clock.getElapsedTime()) % 30;
@@ -253,14 +252,14 @@ function artwork(this: SketchThreeClass): SketchThreeObject {
 
     timer++;
 
-    if (!stopped) {
-      CanvasCapture.recordFrame();
-    }
+    // if (!stopped) {
+    //   CanvasCapture.recordFrame();
+    // }
 
-    if (this.clock.getElapsedTime() >= 2 && !stopped) {
-      stopped = true;
-      CanvasCapture.stopRecord();
-    }
+    // if (this.clock.getElapsedTime() >= 2 && !stopped) {
+    //   stopped = true;
+    //   CanvasCapture.stopRecord();
+    // }
   };
 
   return {
