@@ -5,8 +5,9 @@
   "main": "index.ts",
   "scripts": {
     "build": "webpack --config ./bundler/webpack.prod.js",
-    "dev": "webpack serve --config ./bundler/webpack.dev.js",
-    "lint": "eslint './src/**/*.{js,ts,tsx}' --quiet --fix"
+    "start": "webpack serve --config ./bundler/webpack.dev.js",
+    "lint": "eslint './src/**/*.{js,ts,tsx}' --quiet --fix",
+    "new": "plop"
   },
   "author": "",
   "license": "ISC",
