@@ -10,8 +10,7 @@ const infoColor = (_message) => {
 module.exports = merge(commonConfiguration, {
   mode: 'development',
   devServer: {
-    // host: '0.0.0.0',
-    host: 'localhost',
+    host: '0.0.0.0',
     headers: {
       'Cross-Origin-Embedder-Policy': 'require-corp',
       'Cross-Origin-Opener-Policy': 'same-origin',

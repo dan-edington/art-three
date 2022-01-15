@@ -1,4 +1,6 @@
 varying vec2 vUv;
+uniform float geometryNoiseMultX;
+uniform float geometryNoiseMultY;
 
 //	Classic Perlin 2D Noise 
 //	by Stefan Gustavson
@@ -45,8 +47,7 @@ float map(float value, float min1, float max1, float min2, float max2) {
 
 void main() {
   vUv = uv;
-  float newZ = cnoise(vec2(position.x, position.y));
-  // newZ = map(newZ, -1., 1., 0., 1.);
+  float newZ = cnoise(vec2(vUv.x * geometryNoiseMultX * 0.1, vUv.y * geometryNoiseMultY * 0.1)) * 10.0;
   vec3 newPos = vec3(vec2(position.xy), newZ);
   vec4 modelViewPosition = modelViewMatrix * vec4(newPos, 1.0);
   gl_Position = projectionMatrix * modelViewPosition; 

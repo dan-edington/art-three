@@ -40,7 +40,7 @@ module.exports = function (plop) {
       if (data.copyshaders === 'yes') {
         actions.push({
           type: 'addMany',
-          destination: 'src/sketches/{{name}}/shaders',
+          destination: 'src/sketches/{{name}}',
           templateFiles: 'plop-templates/shaders/*.*',
         });
       }

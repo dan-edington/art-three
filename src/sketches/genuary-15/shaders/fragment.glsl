@@ -1,6 +1,7 @@
 varying vec2 vUv;
-uniform float noiseMultX;
-uniform float noiseMultY;
+uniform float textureNoiseMultX;
+uniform float textureNoiseMultY;
+uniform vec3 sandColor;
 
 //	Classic Perlin 2D Noise 
 //	by Stefan Gustavson
@@ -46,7 +47,7 @@ float map(float value, float min1, float max1, float min2, float max2) {
 }
 
 void main() {
-  vec3 baseColor = vec3(1.0, 0.89, 0.8);
-  float s = cnoise(vec2(vUv.x * noiseMultX, vUv.y * noiseMultY));
-  gl_FragColor = vec4(baseColor.xyz * map(s,-1.0,1.0,0.5,1.0), 1.0);
+  // vec3 baseColor = vec3(1.0, 0.96, 0.76);
+  float s = cnoise(vec2(vUv.x * textureNoiseMultX, vUv.y * textureNoiseMultY));
+  gl_FragColor = vec4(sandColor.xyz * map(s,-1.0,1.0,0.6,0.8), 1.0);
 }
