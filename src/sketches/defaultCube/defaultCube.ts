@@ -51,7 +51,7 @@ function defaultCube(this: SketchThreeClass): SketchThreeObject {
   };
 }
 
-export default function (): Artwork<SketchThreeObject> {
+export default function (): Artwork {
   return {
     type: 'THREEJS',
     artworkFunction: defaultCube,

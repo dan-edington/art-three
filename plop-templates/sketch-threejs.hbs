@@ -1,3 +1,4 @@
+//@ts-nocheck
 import * as THREE from 'three';
 import * as dat from 'dat.gui';
 
@@ -52,7 +53,7 @@ function artwork (this: SketchThreeClass): SketchThreeObject {
   };
 }
 
-export default function (): Artwork<SketchThreeObject> {
+export default function (): Artwork {
   return {
     type: 'THREEJS',
     artworkFunction: artwork,

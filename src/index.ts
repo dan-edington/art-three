@@ -5,7 +5,7 @@ import SketchP5 from './Sketch/p5js/Sketch';
 
 (async function () {
   const art = await import(`./sketches/${process.env.SKETCHNAME}/${process.env.SKETCHNAME}`);
-  const { type, artworkFunction } = art.default() as Artwork<any>;
+  const { type, artworkFunction } = art.default() as Artwork;
 
   if (type === 'THREEJS') {
     new SketchThree(artworkFunction).start();
