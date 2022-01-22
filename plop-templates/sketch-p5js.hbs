@@ -6,6 +6,10 @@ import { SketchP5Object } from '../../types/sketchP5';
 function artwork(p5: P5): void {
 
   p5.setup = function () {
+    const seed = Math.round(new Date().getTime() * Math.random());
+    p5.randomSeed(seed);
+    console.log('SEED: ', seed);
+    
     p5.createCanvas(p5.windowWidth, p5.windowHeight);
     //p5.noLoop();
   };
