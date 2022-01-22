@@ -3,13 +3,13 @@ import { Artwork } from './types/artwork';
 import SketchThree from './Sketch/threejs/Sketch';
 import SketchP5 from './Sketch/p5js/Sketch';
 
-import art from './sketches/genuary-16/genuary-16';
+(async function () {
+  const art = await import(`./sketches/${process.env.SKETCHNAME}/${process.env.SKETCHNAME}`);
+  const { type, artworkFunction } = art.default() as Artwork<any>;
 
-const { type, artworkFunction } = art() as Artwork<any>;
-
-if (type === 'THREEJS') {
-  const sketch = new SketchThree(artworkFunction);
-  sketch.start();
-} else if (type === 'P5JS') {
-  const sketch = new SketchP5(artworkFunction);
-}
+  if (type === 'THREEJS') {
+    new SketchThree(artworkFunction).start();
+  } else if (type === 'P5JS') {
+    new SketchP5(artworkFunction);
+  }
+})();

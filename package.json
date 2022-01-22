@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "build": "webpack --config ./bundler/webpack.prod.js",
-    "start": "webpack serve --config ./bundler/webpack.dev.js",
+    "start": "cross-env SKETCHNAME=$npm_config_sketch webpack serve --config ./bundler/webpack.dev.js",
     "lint": "eslint './src/**/*.{js,ts,tsx}' --quiet --fix",
     "new": "plop"
   },
@@ -32,6 +32,7 @@
     "babel-loader": "^8.2.2",
     "clean-webpack-plugin": "^4.0.0-alpha.0",
     "copy-webpack-plugin": "^8.1.1",
+    "cross-env": "^7.0.3",
     "css-loader": "^5.2.4",
     "eslint": "^7.25.0",
     "eslint-config-prettier": "^8.3.0",

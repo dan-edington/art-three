@@ -2,6 +2,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCSSExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   entry: path.resolve(__dirname, '../src/index.ts'),
@@ -19,6 +20,9 @@ module.exports = {
       minify: true,
     }),
     new MiniCSSExtractPlugin(),
+    new webpack.DefinePlugin({
+      'process.env.SKETCHNAME': JSON.stringify(process.env.SKETCHNAME),
+    }),
   ],
   module: {
     rules: [
