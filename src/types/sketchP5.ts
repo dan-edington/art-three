@@ -5,4 +5,4 @@ export interface SketchP5Class {
   P5Instance: P5;
 }
 
-export type SketchP5Object = void;
+export type SketchP5ArtworkFunction = (seed: number) => (p5: P5) => void;

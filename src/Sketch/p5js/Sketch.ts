@@ -1,13 +1,14 @@
 import P5 from 'p5';
-import { SketchP5Class } from '../../types/sketchP5';
+import { SketchP5Class, SketchP5ArtworkFunction } from '../../types/sketchP5';
 
 class SketchP5 implements SketchP5Class {
   DOMNode: HTMLElement;
   P5Instance: P5;
 
-  constructor(sketchFn: () => void) {
+  constructor(sketchFn: SketchP5ArtworkFunction, seed: number) {
     this.DOMNode = this.generateDOM();
-    this.P5Instance = new P5(sketchFn, this.DOMNode);
+    const seededFunction = sketchFn(seed);
+    this.P5Instance = new P5(seededFunction, this.DOMNode);
   }
 
   generateDOM(): HTMLElement {

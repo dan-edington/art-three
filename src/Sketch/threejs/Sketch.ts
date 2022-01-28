@@ -22,9 +22,10 @@ class Sketch implements SketchThreeClass {
   shouldRender: boolean;
   orbit: OrbitControls;
   stats: Stats | null;
+  seed: number;
 
-  constructor(sketchFn: () => SketchThreeObject) {
-    const { setup, onFrame, options } = sketchFn.bind(this)();
+  constructor(sketchFn: () => SketchThreeObject, seed: number) {
+    const { setup, onFrame, options } = sketchFn.bind(this, seed)();
 
     const defaultOptions: SketchThreeOptions = {
       useOrbit: true,
@@ -39,6 +40,7 @@ class Sketch implements SketchThreeClass {
     this.setup = setup;
     this.onFrame = onFrame;
     this.stats = this.options.showStats ? Stats() : null;
+    this.seed = seed;
 
     this.start = async () => {
       if (this.stats) {

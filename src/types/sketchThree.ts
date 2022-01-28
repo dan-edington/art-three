@@ -27,6 +27,7 @@ export interface SketchThreeClass {
   shouldRender: boolean;
   orbit: OrbitControls;
   stats: Stats | null;
+  seed: number;
 }
 
 export interface SketchThreeObject {
@@ -34,3 +35,5 @@ export interface SketchThreeObject {
   onFrame(): void;
   options?: SketchThreeOptions;
 }
+
+export type SketchThreeArtworkFunction = (this: SketchThreeClass) => void;

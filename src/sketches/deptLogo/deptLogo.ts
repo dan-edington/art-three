@@ -2,7 +2,11 @@ import * as THREE from 'three';
 import * as dat from 'dat.gui';
 import gsap from 'gsap';
 
-import { SketchThreeObject, SketchThreeClass } from '../../types/sketchThree';
+import {
+  SketchThreeObject,
+  SketchThreeClass,
+  SketchThreeArtworkFunction,
+} from '../../types/sketchThree';
 import { Artwork } from '../../types/artwork';
 
 import logo from './deptLogo.png';
@@ -126,7 +130,7 @@ function deptLogo(this: SketchThreeClass): SketchThreeObject {
   };
 }
 
-export default function (): Artwork {
+export default function (): Artwork<SketchThreeArtworkFunction> {
   return {
     type: 'THREEJS',
     artworkFunction: deptLogo,
