@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import * as dat from 'dat.gui';
+// import * as dat from 'dat.gui';
 import gsap from 'gsap';
 
 import {
@@ -16,7 +16,7 @@ import particlesFrag from './shaders/particles.frag';
 import particlesVert from './shaders/particles.vert';
 
 function deptLogo(this: SketchThreeClass): SketchThreeObject {
-  let gui: dat.GUI;
+  // let gui: dat.GUI;
   let lights;
   let imagePlane: THREE.Mesh<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>;
   let particles: THREE.Points<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>;
@@ -42,26 +42,24 @@ function deptLogo(this: SketchThreeClass): SketchThreeObject {
   const createImagePlane = function (): Promise<
     THREE.Mesh<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>
   > {
-    return new Promise<THREE.Mesh<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>>(
-      (resolve, reject) => {
-        new THREE.TextureLoader().load(logo, (texture) => {
-          imageWidth = texture.image.width / texture.image.height;
-          const plane = new THREE.PlaneBufferGeometry(imageWidth, 1, 1, 1);
+    return new Promise<THREE.Mesh<THREE.PlaneBufferGeometry, THREE.ShaderMaterial>>((resolve) => {
+      new THREE.TextureLoader().load(logo, (texture) => {
+        imageWidth = texture.image.width / texture.image.height;
+        const plane = new THREE.PlaneBufferGeometry(imageWidth, 1, 1, 1);
 
-          const planeMaterial = new THREE.ShaderMaterial({
-            uniforms: {
-              uTexture: { value: texture },
-              uProgress: { value: vars.progress },
-            },
-            vertexShader: imagePlaneVert,
-            fragmentShader: imagePlaneFrag,
-            transparent: true,
-          });
-
-          resolve(new THREE.Mesh(plane, planeMaterial));
+        const planeMaterial = new THREE.ShaderMaterial({
+          uniforms: {
+            uTexture: { value: texture },
+            uProgress: { value: vars.progress },
+          },
+          vertexShader: imagePlaneVert,
+          fragmentShader: imagePlaneFrag,
+          transparent: true,
         });
-      },
-    );
+
+        resolve(new THREE.Mesh(plane, planeMaterial));
+      });
+    });
   };
 
   const createParticles = function (): THREE.Points<
@@ -91,10 +89,10 @@ function deptLogo(this: SketchThreeClass): SketchThreeObject {
     this.shouldRender = true;
   };
 
-  const setupGUI = (): void => {
-    gui = new dat.GUI();
-    gui.add(vars, 'progress', 0.0, 1.0, 0.01).onChange(updateUniforms);
-  };
+  // const setupGUI = (): void => {
+  //   gui = new dat.GUI();
+  //   gui.add(vars, 'progress', 0.0, 1.0, 0.01).onChange(updateUniforms);
+  // };
 
   const startAnimation = (): void => {
     gsap.to(vars, {

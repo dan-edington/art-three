@@ -10,7 +10,7 @@ import { SketchThreeOptions, SketchThreeClass, SketchThreeObject } from '../../t
 
 class Sketch implements SketchThreeClass {
   start: () => void;
-  setup: () => void | Promise<any>;
+  setup: () => void | Promise<unknown>;
   onFrame: () => void;
   init: () => void;
   tick: () => void;
