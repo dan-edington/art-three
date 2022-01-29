@@ -1,9 +1,9 @@
 //@ts-nocheck
 import P5 from 'p5';
 import { Artwork } from '../../types/artwork';
-import { SketchP5Object } from '../../types/sketchP5';
+import { SketchP5ArtworkFunction } from '../../types/sketchP5';
 
-function artwork(p5: P5): void {
+const artwork = (seed: number) => (p5: P5): void => {
   let sourceImage;
 
   function setGradient(x, y, w, h, c1, c2, axis, sourceImg = p5) {
@@ -134,9 +134,9 @@ function artwork(p5: P5): void {
 
     p5.filter(p5.BLUR, 4);
   };
-}
+};
 
-export default function (): Artwork<SketchP5Object> {
+export default function (): Artwork<SketchP5ArtworkFunction> {
   return {
     type: 'P5JS',
     artworkFunction: artwork,

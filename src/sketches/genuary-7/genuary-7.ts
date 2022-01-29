@@ -1,9 +1,9 @@
 //@ts-nocheck
 import P5 from 'p5';
 import { Artwork } from '../../types/artwork';
-import { SketchP5Object } from '../../types/sketchP5';
+import { SketchP5ArtworkFunction } from '../../types/sketchP5';
 
-function artwork(p5: P5): void {
+const artwork = (seed: number) => (p5: P5): void => {
   const colors = ['#ae3849', '#e8d74b', '#1c9bb2', '#cb5f4b', '#047faf', '#c6607b', '#008150'];
   let noiseOverlay;
 
@@ -68,9 +68,9 @@ function artwork(p5: P5): void {
 
     applyFilter();
   };
-}
+};
 
-export default function (): Artwork<SketchP5Object> {
+export default function (): Artwork<SketchP5ArtworkFunction> {
   return {
     type: 'P5JS',
     artworkFunction: artwork,

@@ -1,9 +1,9 @@
 //@ts-nocheck
 import P5 from 'p5';
 import { Artwork } from '../../types/artwork';
-import { SketchP5Object } from '../../types/sketchP5';
+import { SketchP5ArtworkFunction } from '../../types/sketchP5';
 
-function artwork(p5: P5): void {
+const artwork = (seed: number) => (p5: P5): void => {
   const minRadius = p5.random(2, 5);
   const maxRadius = p5.random(200, 500);
   const numberOfCircles = 800;
@@ -86,9 +86,9 @@ function artwork(p5: P5): void {
       circles[i].draw();
     }
   };
-}
+};
 
-export default function (): Artwork<SketchP5Object> {
+export default function (): Artwork<SketchP5ArtworkFunction> {
   return {
     type: 'P5JS',
     artworkFunction: artwork,

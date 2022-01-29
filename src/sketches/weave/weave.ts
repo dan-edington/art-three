@@ -1,11 +1,11 @@
 //@ts-nocheck
 import P5 from 'p5';
 import { Artwork } from '../../types/artwork';
-import { SketchP5Object } from '../../types/sketchP5';
+import { SketchP5ArtworkFunction } from '../../types/sketchP5';
 
 import * as CanvasCapture from 'canvas-capture';
 
-function artwork(p5: P5): void {
+const artwork = (seed: number) => (p5: P5): void => {
   const center = p5.createVector(p5.windowWidth / 2, p5.windowHeight / 2);
   let nX = new Date().getTime() * Math.random();
   let nY = new Date().getTime() * Math.random();
@@ -94,9 +94,9 @@ function artwork(p5: P5): void {
       CanvasCapture.stopRecord();
     }
   };
-}
+};
 
-export default function (): Artwork<SketchP5Object> {
+export default function (): Artwork<SketchP5ArtworkFunction> {
   return {
     type: 'P5JS',
     artworkFunction: artwork,

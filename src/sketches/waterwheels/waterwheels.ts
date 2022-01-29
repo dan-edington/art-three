@@ -2,8 +2,12 @@
 
 import * as CANNON from 'cannon-es';
 import * as THREE from 'three';
-import * as dat from 'dat.gui';
-import { SketchThreeObject, SketchThreeClass } from '../../types/sketchThree';
+
+import {
+  SketchThreeObject,
+  SketchThreeClass,
+  SketchThreeArtworkFunction,
+} from '../../types/sketchThree';
 import { Artwork } from '../../types/artwork';
 
 interface Wheel {
@@ -273,7 +277,7 @@ function waterwheels(this: SketchThreeClass): SketchThreeObject {
   };
 }
 
-export default function (): Artwork<SketchThreeObject> {
+export default function (): Artwork<SketchThreeArtworkFunction> {
   return {
     type: 'THREEJS',
     artworkFunction: waterwheels,

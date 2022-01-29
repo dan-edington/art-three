@@ -13,7 +13,11 @@ import './noise.js';
 
 import * as dat from 'dat.gui';
 
-import { SketchThreeObject, SketchThreeClass } from '../../types/sketchThree';
+import {
+  SketchThreeObject,
+  SketchThreeClass,
+  SketchThreeArtworkFunction,
+} from '../../types/sketchThree';
 import { Artwork } from '../../types/artwork';
 
 import vertexShader from './shaders/vertex.glsl';
@@ -172,7 +176,7 @@ function artwork(this: SketchThreeClass): SketchThreeObject {
   };
 }
 
-export default function (): Artwork<SketchThreeObject> {
+export default function (): Artwork<SketchThreeArtworkFunction> {
   return {
     type: 'THREEJS',
     artworkFunction: artwork,

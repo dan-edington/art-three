@@ -1,7 +1,11 @@
 //@ts-nocheck
 import * as THREE from 'three';
 
-import { SketchThreeObject, SketchThreeClass } from '../../types/sketchThree';
+import {
+  SketchThreeObject,
+  SketchThreeClass,
+  SketchThreeArtworkFunction,
+} from '../../types/sketchThree';
 import { Artwork } from '../../types/artwork';
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
@@ -244,7 +248,7 @@ function artwork(this: SketchThreeClass): SketchThreeObject {
   };
 }
 
-export default function (): Artwork<SketchThreeObject> {
+export default function (): Artwork<SketchThreeArtworkFunction> {
   return {
     type: 'THREEJS',
     artworkFunction: artwork,

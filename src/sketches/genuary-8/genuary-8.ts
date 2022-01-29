@@ -4,7 +4,11 @@ import * as THREE from 'three';
 
 import './noise.js';
 
-import { SketchThreeObject, SketchThreeClass } from '../../types/sketchThree';
+import {
+  SketchThreeObject,
+  SketchThreeClass,
+  SketchThreeArtworkFunction,
+} from '../../types/sketchThree';
 import { Artwork } from '../../types/artwork';
 
 import vertexShader from './shaders/vertex.glsl';
@@ -86,7 +90,7 @@ function artwork(this: SketchThreeClass): SketchThreeObject {
 
   let t = 0;
 
-  const stopped = false;
+  // const stopped = false;
   const cameraHeight = 0.08;
   const speed = 0.001;
 
@@ -126,7 +130,7 @@ function artwork(this: SketchThreeClass): SketchThreeObject {
   };
 }
 
-export default function (): Artwork<SketchThreeObject> {
+export default function (): Artwork<SketchThreeArtworkFunction> {
   return {
     type: 'THREEJS',
     artworkFunction: artwork,

@@ -4,9 +4,9 @@
 
 import P5 from 'p5';
 import { Artwork } from '../../types/artwork';
-import { SketchP5Object } from '../../types/sketchP5';
+import { SketchP5ArtworkFunction } from '../../types/sketchP5';
 
-function artwork(p5: P5): void {
+const artwork = (seed: number) => (p5: P5): void => {
   p5.setup = function () {
     p5.createCanvas(800, 800);
     p5.noLoop();
@@ -85,9 +85,9 @@ function artwork(p5: P5): void {
   // p5.windowResized = function () {
   //   p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
   // };
-}
+};
 
-export default function (): Artwork<SketchP5Object> {
+export default function (): Artwork<SketchP5ArtworkFunction> {
   return {
     type: 'P5JS',
     artworkFunction: artwork,

@@ -1,16 +1,17 @@
 // @ts-nocheck
 import * as THREE from 'three';
 
-import { SketchThreeObject, SketchThreeClass } from '../../types/sketchThree';
+import {
+  SketchThreeObject,
+  SketchThreeClass,
+  SketchThreeArtworkFunction,
+} from '../../types/sketchThree';
 import { Artwork } from '../../types/artwork';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { BufferGeometry } from 'three';
 
 function portal(this: SketchThreeClass): SketchThreeObject {
   let lights;
-
-  const vars = {};
 
   const createLights = function () {
     return {
@@ -78,7 +79,7 @@ function portal(this: SketchThreeClass): SketchThreeObject {
   };
 }
 
-export default function (): Artwork<SketchThreeObject> {
+export default function (): Artwork<SketchThreeArtworkFunction> {
   return {
     type: 'THREEJS',
     artworkFunction: portal,

@@ -1,7 +1,11 @@
 //@ts-nocheck
 import * as THREE from 'three';
 // import * as CanvasCapture from 'canvas-capture';
-import { SketchThreeObject, SketchThreeClass } from '../../types/sketchThree';
+import {
+  SketchThreeObject,
+  SketchThreeClass,
+  SketchThreeArtworkFunction,
+} from '../../types/sketchThree';
 import { Artwork } from '../../types/artwork';
 
 const randomBetween = (min: number, max: number) => Math.random() * (max - min) + min;
@@ -276,7 +280,7 @@ function artwork(this: SketchThreeClass): SketchThreeObject {
   };
 }
 
-export default function (): Artwork<SketchThreeObject> {
+export default function (): Artwork<SketchThreeArtworkFunction> {
   return {
     type: 'THREEJS',
     artworkFunction: artwork,

@@ -1,9 +1,9 @@
 //@ts-nocheck
 import P5 from 'p5';
 import { Artwork } from '../../types/artwork';
-import { SketchP5Object } from '../../types/sketchP5';
+import { SketchP5ArtworkFunction } from '../../types/sketchP5';
 
-function artwork(p5: P5): void {
+const artwork = (seed: number) => (p5: P5): void => {
   const squareSize = 300;
   const speedLimit = 4;
   const squares = [];
@@ -106,9 +106,9 @@ function artwork(p5: P5): void {
 
     p5.pop();
   };
-}
+};
 
-export default function (): Artwork<SketchP5Object> {
+export default function (): Artwork<SketchP5ArtworkFunction> {
   return {
     type: 'P5JS',
     artworkFunction: artwork,
