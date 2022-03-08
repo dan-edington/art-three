@@ -5,7 +5,8 @@ import { SketchP5ArtworkFunction } from '../../types/sketchP5';
 const artwork = (seed: number) => (p5: P5): void => {
 
   p5.setup = function () {
-    p5.randomSeed(seed);
+    p5.noiseSeed(seed);
+    p5.randomSeed(seed);]
     
     p5.createCanvas(p5.windowWidth, p5.windowHeight);
     //p5.noLoop();

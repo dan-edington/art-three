@@ -1,109 +1,154 @@
 import P5 from 'p5';
 import { Artwork } from '../../types/artwork';
 import { SketchP5ArtworkFunction } from '../../types/sketchP5';
-import { map } from '../../util/math';
 
 /*
 SEEDS:
-
+1234552636658
+704533665443
+155886698777
+1469267824587
+185552810222
+568302445769
+504583409659
+1353508536524
+739184037602
+765750511181
+1251325995349
+1393757821946
+1593487533796
+1212863139133
+1618151481409
+85196780735
+1288887673963
+218334494909
+987230861321
+1550353129644
+515991930439
+629628517245
 */
 
 const artwork = (seed: number) => (p5: P5): void => {
   const pallete = [
+    // p5.color('#459476'),
+    // p5.color('#2a4498'),
+
     p5.color('#255AB5'),
     p5.color('#F7D648'),
-    // p5.color('#000000'),
-    // p5.color('#dfdfdf'),
+    p5.color('#000000'),
+    p5.color('#dfdfdf'),
   ];
 
-  const sunflowerImages: Array<P5.Image> = new Array(6);
+  const tintPallete = [pallete[0], pallete[1]];
+  const bgPallete = [pallete[2], pallete[3]];
+
+  const imageCount = 6; //13;
+  const images: Array<P5.Image> = [];
+  let rows: Array<number>, cols: Array<number>;
 
   const size = 900;
+  const blankChance = 0.2;
+  const axisPiecesMax = 8;
+  const gridCols = 12;
+  const sizeOffsetRange = Math.floor(size / axisPiecesMax);
+  const scaleMin = 0.3;
+  const overlayMaxOpacity = 0.5;
 
-  p5.preload = function () {
-    for (let i = 1; i <= sunflowerImages.length; i++) {
-      const img = p5.loadImage(`./computational-collagism/sunflower${i}.jpeg`);
-      sunflowerImages[i - 1] = img;
+  const generateGridAxis = (): Array<number> => {
+    // const averageSize = size / numberOfPieces;
+    // let difference = 0;
+    // for (let i = 0; i < numberOfPieces; i++) {
+    //   const sizeOffset = Math.floor(p5.random(-sizeOffsetRange, sizeOffsetRange));
+    //   const size = averageSize + sizeOffset;
+    //   difference += size - averageSize;
+    //   gridAxis.push(size);
+    // }
+    // gridAxis[numberOfPieces - 1] = gridAxis[numberOfPieces - 1] - difference;
+    const oneCol = 900 / gridCols;
+    const colSpanCount = Math.floor(p5.random(1, axisPiecesMax));
+    const maxInitialColSpanSize = Math.floor(gridCols / colSpanCount);
+    const initialCols = [];
+    let remainingCols = gridCols;
+
+    for (let i = 0; i < colSpanCount; i++) {
+      const colSpanSize = Math.floor(p5.random(1, maxInitialColSpanSize));
+      remainingCols -= colSpanSize;
+      initialCols.push(colSpanSize);
+    }
+
+    for (let i = 0; i < remainingCols; i++) {
+      const randomCol = Math.floor(p5.random(0, initialCols.length));
+      initialCols[randomCol]++;
+    }
+
+    const gridAxis = initialCols.map((col) => col * oneCol);
+
+    return gridAxis;
+  };
+
+  const drawCollagePiece = (
+    img: P5.Image,
+    color: P5.Color,
+    xPos: number,
+    yPos: number,
+    width: number,
+    height: number,
+  ) => {
+    if (img) {
+      const selectedImage = { ...images[Math.floor(p5.random(0, images.length))] } as P5.Image;
+      const sx = Math.floor(p5.random(0, selectedImage.width * 0.5 - width * 0.5));
+      const sy = Math.floor(p5.random(0, selectedImage.height * 0.5 - height * 0.5));
+      const scale = 1; //p5.random(1, 2);
+
+      const offscreen = p5.createGraphics(width, height);
+      offscreen.image(selectedImage, 0, 0, width, height, sx, sy, width / scale, height / scale);
+      offscreen.filter(p5.GRAY);
+
+      p5.tint(color);
+      p5.image(offscreen, xPos, yPos, width, height, 0, 0);
+    } else {
+      p5.noStroke();
+      p5.fill(color);
+      p5.rect(xPos, yPos, width, height);
     }
   };
 
-  const colorOverlay = () => {
-    p5.blendMode(p5.SCREEN);
-    p5.noStroke();
-    p5.fill(pallete[0]);
-    p5.rect(0, 0, p5.width, p5.height * 0.5);
-    p5.fill(pallete[1]);
-    p5.rect(0, p5.height * 0.5, p5.width, p5.height);
-  };
-
-  const drawSunflower = (position: P5.Vector, size: number, zoom: number, scale: number) => {
-    const img = sunflowerImages[Math.floor(p5.random(0, sunflowerImages.length))];
-
-    const mask = p5.createGraphics(size, size);
-    // mask.pixelDensity(1);
-    mask.fill('blue');
-    mask.noStroke();
-    mask.ellipseMode(p5.CENTER);
-    mask.ellipse(size * 0.5, size * 0.5, size);
-
-    // p5.tint(255, p5.random(64, 255));
-
-    const newImg = p5.createImage(size, size);
-    newImg.copy(
-      img,
-      img.width * 0.5 - size,
-      img.height * 0.5 - size,
-      size * zoom,
-      size * zoom,
-      0,
-      0,
-      size,
-      size,
-    );
-
-    //@ts-ignore
-    newImg.mask(mask);
-
-    p5.image(newImg, position.x, position.y, size * scale, size * scale);
-    // p5.image(
-    //   img,
-    //   position.x - size * 0.5,
-    //   position.y - size * 0.5,
-    //   size * 2,
-    //   size * 2,
-    //   img.width * 0.5 - size,
-    //   img.height * 0.5 - size,
-    //   size * scale,
-    //   size * scale,
-    // );
+  p5.preload = function () {
+    for (let i = 1; i <= imageCount; i++) {
+      const img = p5.loadImage(`./computational-collagism/sunflower${i}.png`);
+      images.push(img);
+    }
   };
 
   p5.setup = function () {
     p5.randomSeed(seed);
-    p5.noiseSeed(seed);
     p5.createCanvas(size, size);
     p5.noLoop();
+    cols = generateGridAxis();
+    rows = generateGridAxis();
   };
 
   p5.draw = function () {
-    p5.background(255);
-    const count = 10;
-    const maxSize = 150;
-    const minSize = 100;
+    p5.background(bgPallete[Math.floor(p5.random(0, bgPallete.length))]);
 
-    // p5.blendMode(p5.MULTIPLY);
+    let xPos = 0;
+    let yPos = 0;
 
-    for (let i = 0; i < count; i++) {
-      const x = p5.random(0, p5.width);
-      const y = p5.random(0, p5.height);
-      const size = Math.floor(p5.random(minSize, maxSize));
-      const zoom = map(size, minSize, maxSize, 5, 2);
-      const scale = p5.random(1, 3);
-      drawSunflower(p5.createVector(x, y), size, zoom, scale);
+    for (let i = 0; i < rows.length; i++) {
+      for (let j = 0; j < cols.length; j++) {
+        const img = p5.random() > blankChance ? images[Math.floor(p5.random(images.length))] : null;
+        let color;
+        if (img) {
+          color = tintPallete[Math.floor(p5.random(tintPallete.length))];
+        } else {
+          color = pallete[Math.floor(p5.random(pallete.length))];
+        }
+        drawCollagePiece(img, color, xPos, yPos, cols[j], rows[i]);
+        xPos += cols[j];
+      }
+      yPos += rows[i];
+      xPos = 0;
     }
-    // p5.filter(p5.GRAY);
-
-    // colorOverlay();
   };
 };
 
