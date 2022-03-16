@@ -30,9 +30,6 @@ SEEDS:
 
 const artwork = (seed: number) => (p5: P5): void => {
   const pallete = [
-    // p5.color('#459476'),
-    // p5.color('#2a4498'),
-
     p5.color('#255AB5'),
     p5.color('#F7D648'),
     p5.color('#000000'),
@@ -42,14 +39,30 @@ const artwork = (seed: number) => (p5: P5): void => {
   const tintPallete = [pallete[0], pallete[1]];
   const bgPallete = [pallete[2], pallete[3]];
 
+  const fonts: Array<P5.Font> = [];
+  const fontVariants = [
+    'Thin',
+    'Black',
+    'Bold',
+    'Light',
+    'ExtraBold',
+    'ExtraLight',
+    'Medium',
+    'SemiBold',
+    'Regular',
+  ];
+
   const imageCount = 6; //13;
   const images: Array<P5.Image> = [];
   let rows: Array<number>, cols: Array<number>;
 
   const size = 900;
-  const blankChance = 0.2;
-  const axisPiecesMax = 8;
+  const blankChance = 0.4;
+  const textChance = 0;
+  let textDrawn = false;
+  const axisPiecesMax = 6;
   const gridCols = 12;
+  const imageSourceOffsetRange = 100;
   const sizeOffsetRange = Math.floor(size / axisPiecesMax);
   const scaleMin = 0.3;
   const overlayMaxOpacity = 0.5;
@@ -86,6 +99,47 @@ const artwork = (seed: number) => (p5: P5): void => {
     return gridAxis;
   };
 
+  const writeText = (
+    xPos: number,
+    yPos: number,
+    width: number,
+    height: number,
+    color: P5.Color,
+  ): void => {
+    const offscreen = p5.createGraphics(width, height);
+    let textSize, leading;
+
+    if (height > width) {
+      // vertical
+      textSize = p5.map(height, size / rows.length, size, 50, 100);
+      leading = p5.map(textSize, 100, 200, 80, 150);
+    } else {
+      // horizontal
+      textSize = p5.map(width, 1, size / cols.length, 50, 100);
+      leading = p5.map(textSize, 100, 200, 80, 150);
+    }
+
+    if (color === pallete[0] || color === pallete[2]) {
+      offscreen.fill(pallete[p5.random() > 0.5 ? 1 : 3]);
+    } else {
+      offscreen.fill(pallete[p5.random() > 0.5 ? 2 : 0]);
+    }
+
+    const font = fonts[Math.floor(p5.random(0, fonts.length))];
+
+    offscreen.noStroke();
+    offscreen.textSize(textSize);
+    offscreen.textLeading(leading);
+    offscreen.textAlign(p5.RIGHT, p5.BOTTOM);
+    offscreen.textWrap(p5.CHAR);
+    offscreen.textFont(font);
+    console.log(font);
+    offscreen.text('PEACE', 0, 0, width + textSize * 0.03, height + textSize * 0.23);
+    textDrawn = true;
+    p5.blendMode(p5.BLEND);
+    p5.image(offscreen, xPos, yPos);
+  };
+
   const drawCollagePiece = (
     img: P5.Image,
     color: P5.Color,
@@ -96,9 +150,11 @@ const artwork = (seed: number) => (p5: P5): void => {
   ) => {
     if (img) {
       const selectedImage = { ...images[Math.floor(p5.random(0, images.length))] } as P5.Image;
-      const sx = Math.floor(p5.random(0, selectedImage.width * 0.5 - width * 0.5));
-      const sy = Math.floor(p5.random(0, selectedImage.height * 0.5 - height * 0.5));
-      const scale = 1; //p5.random(1, 2);
+      const sxOff = p5.random(-imageSourceOffsetRange, imageSourceOffsetRange);
+      const syOff = p5.random(-imageSourceOffsetRange, imageSourceOffsetRange);
+      const sx = Math.floor(p5.random(0, selectedImage.width * 0.5 - width * 0.5)) + sxOff;
+      const sy = Math.floor(p5.random(0, selectedImage.height * 0.5 - height * 0.5)) + syOff;
+      const scale = p5.random(1, 2);
 
       const offscreen = p5.createGraphics(width, height);
       offscreen.image(selectedImage, 0, 0, width, height, sx, sy, width / scale, height / scale);
@@ -110,6 +166,10 @@ const artwork = (seed: number) => (p5: P5): void => {
       p5.noStroke();
       p5.fill(color);
       p5.rect(xPos, yPos, width, height);
+
+      if (!textDrawn && p5.random() > textChance) {
+        writeText(xPos, yPos, width, height, color);
+      }
     }
   };
 
@@ -117,6 +177,10 @@ const artwork = (seed: number) => (p5: P5): void => {
     for (let i = 1; i <= imageCount; i++) {
       const img = p5.loadImage(`./computational-collagism/sunflower${i}.png`);
       images.push(img);
+    }
+
+    for (let i = 0; i < fontVariants.length; i++) {
+      fonts.push(p5.loadFont(`./Inter-${fontVariants[i]}.ttf`));
     }
   };
 
