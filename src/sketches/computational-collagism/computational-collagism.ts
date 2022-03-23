@@ -1,9 +1,12 @@
 import P5 from 'p5';
+import { Points } from 'three';
 import { Artwork } from '../../types/artwork';
 import { SketchP5ArtworkFunction } from '../../types/sketchP5';
 
 /*
 SEEDS:
+657635256796
+
 174616579851
 24876316212
 903006744114
@@ -35,8 +38,10 @@ const artwork = (seed: number) => (p5: P5): void => {
     'Regular',
   ];
 
-  const imageCount = 10;
-  const images: Array<P5.Image> = [];
+  const sunflowerImageCount = 10;
+  const sunflowerImages: Array<P5.Image> = [];
+  const tankImageCount = 2;
+  const tankImages: Array<P5.Image> = [];
   let rows: Array<number>, cols: Array<number>;
 
   let textDrawn = false;
@@ -116,7 +121,9 @@ const artwork = (seed: number) => (p5: P5): void => {
     height: number,
   ) => {
     if (img) {
-      const selectedImage = { ...images[Math.floor(p5.random(0, images.length))] } as P5.Image;
+      const selectedImage = {
+        ...sunflowerImages[Math.floor(p5.random(0, sunflowerImages.length))],
+      } as P5.Image;
       const sxOff = p5.random(-imageSourceOffsetRange, imageSourceOffsetRange);
       const syOff = p5.random(-imageSourceOffsetRange, imageSourceOffsetRange);
       const sx = Math.floor(p5.random(0, selectedImage.width * 0.5 - width * 0.5)) + sxOff;
@@ -144,10 +151,180 @@ const artwork = (seed: number) => (p5: P5): void => {
     }
   };
 
+  const drawGrid = () => {
+    let xPos = 0;
+    let yPos = 0;
+
+    for (let i = 0; i < rows.length; i++) {
+      for (let j = 0; j < cols.length; j++) {
+        const img =
+          p5.random() > blankChance
+            ? sunflowerImages[Math.floor(p5.random(sunflowerImages.length))]
+            : null;
+        let color;
+        if (img) {
+          color = tintPallete[Math.floor(p5.random(tintPallete.length))];
+        } else {
+          color = tintPallete[Math.floor(p5.random(tintPallete.length))];
+        }
+        drawCollagePiece(img, color, xPos, yPos, cols[j], rows[i]);
+        xPos += cols[j];
+      }
+      yPos += rows[i];
+      xPos = 0;
+    }
+  };
+
+  const drawPaperOverlay = () => {
+    const offscreen = p5.createGraphics(size, size);
+    const padding = size * 0.25;
+    const base = size * p5.random(0.3, 0.7);
+    const spread = 20;
+    const height = p5.random(100, 200);
+    const maxAngle = 5;
+    const angle = p5.random(-maxAngle, maxAngle);
+
+    const topPoints = [];
+    const bottomPoints = [];
+    const options = [];
+    options.push(
+      {
+        jaginess: p5.random(0.01, 0.05),
+        increments: size / p5.random(50, 500),
+        slope: p5.random(-0.2, 0.2),
+      },
+      {
+        jaginess: p5.random(0.01, 0.05),
+        increments: size / p5.random(50, 500),
+        slope: p5.random(-0.2, 0.2),
+      },
+    );
+
+    offscreen.noStroke();
+
+    {
+      offscreen.push();
+      offscreen.angleMode(p5.DEGREES);
+      offscreen.rotate(angle);
+
+      offscreen.beginShape();
+
+      const startingPointTop = new P5.Vector(-padding, base);
+      offscreen.vertex(startingPointTop.x, startingPointTop.y);
+      topPoints.push(startingPointTop);
+
+      let { jaginess, increments, slope } = options[0];
+
+      for (let i = 0 - padding; i <= size + padding; i += increments) {
+        const secondBase = base + height;
+        const yPos = secondBase + p5.noise(i * jaginess, secondBase * jaginess) * spread;
+        const vertexPosition = new P5.Vector(i, yPos + i * slope);
+        offscreen.vertex(vertexPosition.x, vertexPosition.y);
+        topPoints.push(vertexPosition);
+      }
+
+      const startingPointBottom = new P5.Vector(size + increments + padding, base);
+      offscreen.vertex(startingPointBottom.x, startingPointBottom.y);
+      bottomPoints.push(startingPointBottom);
+
+      jaginess = options[1].jaginess;
+      increments = options[1].increments;
+      slope = options[1].slope;
+
+      for (let i = size + padding; i >= 0 - padding; i -= increments) {
+        const secondBase = base - height;
+        const yPos = base - p5.noise(i * jaginess, secondBase * jaginess) * spread;
+        const vertexPosition = new P5.Vector(i, yPos + i * slope);
+        offscreen.vertex(vertexPosition.x, vertexPosition.y);
+        bottomPoints.push(vertexPosition);
+      }
+
+      offscreen.fill(0);
+
+      offscreen.endShape();
+      offscreen.pop();
+    }
+
+    const maskImage = p5.createImage(size, size);
+    maskImage.copy(offscreen, 0, 0, size, size, 0, 0, size, size);
+
+    const tankImage = tankImages[Math.floor(p5.random(tankImages.length))];
+    tankImage.filter(p5.GRAY);
+    tankImage.mask(maskImage);
+
+    const offscreen2 = p5.createGraphics(size, size);
+    offscreen2.image(tankImage, 0, 0, size, size);
+
+    {
+      const tearWidth = p5.random(5, 35);
+      const maxOffset = 4;
+      offscreen2.push();
+      offscreen2.angleMode(p5.DEGREES);
+      offscreen2.rotate(angle);
+
+      offscreen2.noStroke();
+      offscreen2.beginShape();
+
+      offscreen2.vertex(topPoints[0].x, topPoints[0].y);
+
+      for (let i = 1; i < topPoints.length; i++) {
+        offscreen2.vertex(topPoints[i].x, topPoints[i].y);
+      }
+
+      for (let i = topPoints.length - 1; i > 0; i--) {
+        offscreen2.vertex(
+          topPoints[i].x + p5.noise(topPoints[i].x) * maxOffset,
+          topPoints[i].y + tearWidth + p5.noise(topPoints[i].y) * maxOffset,
+        );
+      }
+
+      offscreen2.fill(225);
+
+      offscreen2.endShape();
+      offscreen2.pop();
+    }
+
+    {
+      const tearWidth = p5.random(5, 35);
+      const maxOffset = 4;
+      offscreen2.push();
+      offscreen2.angleMode(p5.DEGREES);
+      offscreen2.rotate(angle);
+
+      offscreen2.noStroke();
+      offscreen2.beginShape();
+
+      offscreen2.vertex(bottomPoints[0].x, bottomPoints[0].y);
+
+      for (let i = 1; i < bottomPoints.length; i++) {
+        offscreen2.vertex(bottomPoints[i].x, bottomPoints[i].y);
+      }
+
+      for (let i = bottomPoints.length - 1; i > 0; i--) {
+        offscreen2.vertex(
+          bottomPoints[i].x + p5.noise(bottomPoints[i].x) * maxOffset,
+          bottomPoints[i].y - tearWidth + p5.noise(bottomPoints[i].y) * maxOffset,
+        );
+      }
+
+      offscreen2.fill(225);
+
+      offscreen2.endShape();
+      offscreen2.pop();
+    }
+
+    p5.image(offscreen2, 0, 0, size, size);
+  };
+
   p5.preload = function () {
-    for (let i = 1; i <= imageCount; i++) {
+    for (let i = 1; i <= sunflowerImageCount; i++) {
       const img = p5.loadImage(`./computational-collagism/sunflower${i}.png`);
-      images.push(img);
+      sunflowerImages.push(img);
+    }
+
+    for (let i = 1; i <= tankImageCount; i++) {
+      const img = p5.loadImage(`./computational-collagism/tank${i}.jpeg`);
+      tankImages.push(img);
     }
 
     for (let i = 0; i < fontVariants.length; i++) {
@@ -164,24 +341,9 @@ const artwork = (seed: number) => (p5: P5): void => {
   };
 
   p5.draw = function () {
-    let xPos = 0;
-    let yPos = 0;
-
-    for (let i = 0; i < rows.length; i++) {
-      for (let j = 0; j < cols.length; j++) {
-        const img = p5.random() > blankChance ? images[Math.floor(p5.random(images.length))] : null;
-        let color;
-        if (img) {
-          color = tintPallete[Math.floor(p5.random(tintPallete.length))];
-        } else {
-          color = tintPallete[Math.floor(p5.random(tintPallete.length))];
-        }
-        drawCollagePiece(img, color, xPos, yPos, cols[j], rows[i]);
-        xPos += cols[j];
-      }
-      yPos += rows[i];
-      xPos = 0;
-    }
+    p5.background(255);
+    drawGrid();
+    drawPaperOverlay();
   };
 };
 
