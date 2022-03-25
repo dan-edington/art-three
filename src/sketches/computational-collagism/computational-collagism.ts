@@ -343,7 +343,7 @@ const artwork = (seed: number) => (p5: P5): void => {
   p5.draw = function () {
     p5.background(255);
     drawGrid();
-    drawPaperOverlay();
+    // drawPaperOverlay();
   };
 };
 
