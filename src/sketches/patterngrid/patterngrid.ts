@@ -7,32 +7,12 @@ const artwork = (seed: number) => (p5: P5): void => {
 
   const colors: Record<string, any> = {};
 
-  const directions = [];
-
-  const generateSize = () => {
-    const limit = 10000;
-    let count = 0;
-    let found = false;
-    let answer = 100;
-    while (!found) {
-      const r = Math.round(p5.random(1, 5));
-      if (r % 5 === 0) {
-        answer = r * 100;
-        found = true;
-      }
-      count++;
-      if (count > limit) {
-        break;
-      }
-    }
-    console.log(answer);
-    return answer;
-  };
-
-  const size = Math.round(p5.random(1, 100)) * 5;
+  const sizes = [20, 25, 50, 100, 125, 250, 500];
+  let size: number;
 
   const squareFunctions = [
-    (x: number, y: number) => {
+    (x: number, y: number, accent: boolean) => {
+      //STRIPES
       let stripes = Math.round(p5.random(5, 11));
       if (stripes % 2 === 0) {
         stripes -= 1;
@@ -50,36 +30,23 @@ const artwork = (seed: number) => (p5: P5): void => {
       for (let i = 0; i < size; i += a) {
         if (count % 2 === 0) {
           p5.noStroke();
-          p5.fill(colors.fill);
+          p5.fill(accent ? colors.accent : colors.fill);
           p5.rect(0, i, size, a);
         }
         count++;
       }
       p5.pop();
     },
-    // (x: number, y: number) => {
-    //   const w = 11;
-    //   const middleX = x + size * 0.5;
-    //   const middleY = y + size * 0.5;
-    //   p5.strokeWeight(w);
-    //   if (p5.random() > 0.5) {
-    //     p5.noFill();
-    //   } else {
-    //     p5.fill(colors.fill);
-    //   }
-    //   p5.stroke(colors.fill);
-    //   p5.circle(middleX, middleY, p5.random(50, size - w));
-    // },
-    (x: number, y: number) => {
-      p5.fill(colors.fill);
-
-      p5.stroke(colors.bg);
-      const w = p5.random(10, 30);
-      p5.strokeWeight(w);
-
-      p5.rect(x + w, y + w, size - w * 2, size - w * 2);
+    (x: number, y: number, accent: boolean) => {
+      //SQUARE
+      p5.fill(accent ? colors.accent : colors.fill);
+      p5.noStroke();
+      const w = p5.random(size * 0.25, size * 0.75);
+      const s = 0 + (size - w) / 2;
+      p5.rect(s + x, s + y, w, w);
     },
-    (x: number, y: number) => {
+    (x: number, y: number, accent: boolean) => {
+      //NOISE
       const a = size / 10;
       const b = p5.random(0.01, 0.1);
       for (let i = 0; i < size; i += a) {
@@ -88,15 +55,23 @@ const artwork = (seed: number) => (p5: P5): void => {
           const newY = y + j;
           p5.noStroke();
           const n = p5.noise(newX * b, newY * b);
-          p5.fill(n > 0.5 ? colors.bg : colors.fill);
+          p5.fill(n > 0.5 ? colors.bg : accent ? colors.accent : colors.fill);
           p5.rect(newX, newY, a, a);
         }
       }
     },
-    (x: number, y: number) => {
-      return false;
-    },
   ];
+
+  const initColors = () => {
+    const bgHue = p5.random() * 360;
+    colors.fill = p5.color(p5.random() * 360, p5.random() * 40, p5.random() * 40);
+    colors.bg = p5.color(bgHue, p5.random() * 100, 100);
+    let accentHue = bgHue - p5.random(120, 230);
+    if (accentHue < 0) {
+      accentHue = 360 + accentHue;
+    }
+    colors.accent = p5.color(accentHue, 100, 100);
+  };
 
   p5.setup = function () {
     p5.noiseSeed(seed);
@@ -104,15 +79,20 @@ const artwork = (seed: number) => (p5: P5): void => {
     p5.colorMode(p5.HSB);
     p5.createCanvas(dimensions.w, dimensions.h);
     p5.noLoop();
-    colors.fill = p5.color(p5.random() * 100, p5.random() * 50, p5.random() * 50);
-    colors.bg = p5.color(p5.random() * 360, p5.random() * 100, 100);
+    size = sizes[Math.floor(p5.random() * sizes.length)];
+    initColors();
   };
 
   p5.draw = function () {
     p5.background(colors.bg);
-    for (let i = 0; i <= dimensions.w; i += size) {
-      for (let j = 0; j <= dimensions.h; j += size) {
-        squareFunctions[Math.floor(p5.random(0, squareFunctions.length))](i, j);
+    const accentChance = 0.65;
+
+    for (let i = 0; i < dimensions.w; i += size) {
+      for (let j = 0; j < dimensions.h; j += size) {
+        if (p5.noise(i * 0.4, j * 0.4) > 0.6) {
+          const accent = p5.noise(i * 0.05, j * 0.087) > accentChance ? true : false;
+          squareFunctions[Math.floor(p5.noise(i, j) * squareFunctions.length)](i, j, accent);
+        }
       }
     }
   };
