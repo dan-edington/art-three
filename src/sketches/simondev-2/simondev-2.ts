@@ -18,9 +18,7 @@ function artwork(this: SketchThreeClass): SketchThreeObject {
   const gui = new dat.GUI();
 
   const vars = {
-    tint: new THREE.Color(0xff0000),
-    repeatU: 1,
-    repeatV: 1,
+    contrast: 0.0,
   };
 
   const loader = new THREE.TextureLoader();
@@ -33,11 +31,8 @@ function artwork(this: SketchThreeClass): SketchThreeObject {
     const geometry = new THREE.BoxGeometry();
     const material = new THREE.ShaderMaterial({
       uniforms: {
-        tint: { value: new THREE.Vector4(vars.tint.r, vars.tint.g, vars.tint.b, 1) },
+        contrast: { value: vars.contrast },
         diffuse: { value: texture },
-        overlay: { value: overlay },
-        repeatU: { value: vars.repeatU },
-        repeatV: { value: vars.repeatV },
         time: { value: 0 },
         resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
       },
@@ -55,29 +50,15 @@ function artwork(this: SketchThreeClass): SketchThreeObject {
   };
 
   const setup = () => {
+    this.camera.position.z = 1.5;
     lights = createLights();
     lights.point.position.set(2, 2, 2);
     cube = createCube();
     this.scene.add(cube, ...Object.values(lights));
 
-    gui.addColor(vars, 'tint').onChange(() => {
+    gui.add(vars, 'contrast', 0, 1).onChange(() => {
       //@ts-ignore
-      cube.material.uniforms.tint.value = new THREE.Vector4(
-        vars.tint.r / 255,
-        vars.tint.g / 255,
-        vars.tint.b / 255,
-        1,
-      );
-    });
-
-    gui.add(vars, 'repeatU', 0, 10, 1).onChange(() => {
-      //@ts-ignore
-      cube.material.uniforms.repeatU.value = vars.repeatU;
-    });
-
-    gui.add(vars, 'repeatV', 0, 10, 1).onChange(() => {
-      //@ts-ignore
-      cube.material.uniforms.repeatV.value = vars.repeatV;
+      cube.material.uniforms.contrast.value = vars.contrast;
     });
   };
 
