@@ -1,7 +1,7 @@
+precision mediump float;
+
 varying vec2 vUv;
-
 uniform sampler2D diffuse;
-
 uniform float contrast;
 
 void main() {
@@ -21,24 +21,24 @@ void main() {
   if(vUv.y > 0.666) {
     color = mix(red, blue, vUv.x);
   } else if(vUv.y > 0.333) {
-    color = mix(red, blue, step(vUv.x, 0.5));
+    color = mix(blue, red, step(vUv.x, 0.5));
   } else {
     color = mix(red, blue, smoothstep(0.0, 1.0, vUv.x));
   }
 
-  // color = mix(white, color, linearLine);
-  // color = mix(white, color, smoothLine);
-  // color = mix(white, color, stepLine);
+  color = mix(white, color, linearLine);
+  color = mix(white, color, smoothLine);
+  color = mix(white, color, stepLine);
     
-  color = texture2D(diffuse, vUv).rgb;
+  // color = texture2D(diffuse, vUv).rgb;
   // float r = step(contrast, color.r);
   // float g = step(contrast, color.g);
   // float b = step(contrast, color.b);
 
-  float r = smoothstep(contrast,1.0, color.r);
-  float g = smoothstep(contrast,1.0, color.g);
-  float b = smoothstep(contrast,1.0, color.b);
-  color = vec3(r,g,b);
+  // float r = smoothstep(contrast,1.0, color.r);
+  // float g = smoothstep(contrast,1.0, color.g);
+  // float b = smoothstep(contrast,1.0, color.b);
+  // color = vec3(r,g,b);
 
   gl_FragColor = vec4(color, 1.0);
 }

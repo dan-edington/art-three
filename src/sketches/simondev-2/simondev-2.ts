@@ -8,8 +8,8 @@ import {
 } from '../../types/sketchThree';
 import { Artwork } from '../../types/artwork';
 
-import vertexShader from './shaders/vertex.glsl';
-import fragmentShader from './shaders/fragment.glsl';
+import vertexShader from './shaders/vertex.vert';
+import fragmentShader from './shaders/fragment.frag';
 
 function artwork(this: SketchThreeClass): SketchThreeObject {
   let cube: THREE.Mesh;
