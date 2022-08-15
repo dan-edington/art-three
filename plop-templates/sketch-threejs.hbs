@@ -14,35 +14,33 @@ function artwork (this: SketchThreeClass): SketchThreeObject {
   const gui = new dat.GUI();
 
   const vars = {
-    rotation: 0,
   };
 
-  const createCube = function () {
-    const geometry = new THREE.BoxGeometry();
+  const createCube = () => {
+    const geometry = new THREE.BoxBufferGeometry();
     const material = new THREE.MeshStandardMaterial({ color: 'hotpink' });
     return new THREE.Mesh(geometry, material);
   };
 
-  const createLights = function () {
-    return {
+  const createLights = () => {
+    const lights = {
       ambient: new THREE.AmbientLight(0xffffff, 0.25),
       point: new THREE.PointLight(0xffffff, 1.0),
     };
+
+    lights.point.position.set(2, 2, 2);
+
+    this.scene.add(...Object.values(lights));
   };
 
   const setup = () => {
-    gui.add(vars, 'rotation', 0, Math.PI * 2, 0.001);
-    lights = createLights();
-    lights.point.position.set(2, 2, 2);
+    createLights();
     cube = createCube();
-    this.scene.add(cube, ...Object.values(lights));
+    this.scene.add(cube);
   };
 
   const onFrame = () => {
-    if (cube.rotation.y !== vars.rotation) {
-      cube.rotation.y = vars.rotation;
-      this.shouldRender = true;
-    }
+    // this.shouldRender = true;
   };
 
   return {
