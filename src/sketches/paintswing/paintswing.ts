@@ -8,7 +8,7 @@ const artwork = (seed: number) => (p5: P5): void => {
 
   const makeColorScheme = () => {
     const bgHue = Math.floor(p5.noise(p5.random() * 91, p5.random() * 19) * 361);
-    const bg = p5.color(bgHue, 100, 8, 1.0);
+    const bg = p5.color(bgHue, 10, p5.random(8, 19), 1.0);
 
     const paintHue = Math.floor(p5.noise(p5.random() * 23, p5.random() * 9996) * 361);
     const paint = p5.color(paintHue, 50, 500, 1.0);
@@ -37,9 +37,12 @@ const artwork = (seed: number) => (p5: P5): void => {
     const drawDots = p5.random() > 0.5;
     const radius = 150;
     const numpoints = Math.round(p5.random(75, 200));
-
     const xMult = p5.random(0.001, 10);
-    const yMult = p5.random() > 0.75 ? xMult : p5.random(0.001, 10);
+    const yMult = xMult + p5.random(-2.5, 2.5);
+
+    console.log(`numpoints: ${numpoints}`);
+    console.log(`xMult: ${xMult}`);
+    console.log(`yMult: ${yMult}`);
 
     const xPhase = p5.random(-1000, 1000);
     const yPhase = p5.random(-1000, 1000);
@@ -47,9 +50,17 @@ const artwork = (seed: number) => (p5: P5): void => {
     target.push();
     target.translate(p5.width / 2, p5.height / 2);
 
+    const drawCurves = p5.random() > 0.5;
+
+    if (drawCurves) {
+      target.beginShape();
+    }
+
     for (let i = 0; i < numpoints; i++) {
-      const xPos = Math.sin(i * xMult + xPhase) * (radius + p5.random(-0, 0));
-      const yPos = Math.cos(i * yMult + yPhase) * (radius + p5.random(-0, 0));
+      const a = p5.random(-19, 19);
+
+      const xPos = Math.sin(i * xMult + xPhase) * (radius + a);
+      const yPos = Math.cos(i * yMult + yPhase) * (radius + a);
       const dotsize = p5.noise(xPos, yPos) * 4;
 
       if (drawDots) {
@@ -64,12 +75,20 @@ const artwork = (seed: number) => (p5: P5): void => {
       target.noFill();
       target.stroke(colors.paint);
 
-      if (prevX !== null && prevY !== null) {
-        target.line(prevX, prevY, xPos, yPos);
+      if (drawCurves) {
+        target.curveVertex(xPos, yPos);
+      } else {
+        if (prevX !== null && prevY !== null) {
+          target.line(prevX, prevY, xPos, yPos);
+        }
       }
 
       prevX = xPos;
       prevY = yPos;
+    }
+
+    if (drawCurves) {
+      target.endShape();
     }
 
     target.pop();
@@ -81,7 +100,7 @@ const artwork = (seed: number) => (p5: P5): void => {
     target.rect(0, 0, target.width, target.height);
   };
 
-  const drawNoiseOverlay = function () {
+  const drawNoiseOverlay = function (opacity: number) {
     const _overlay = p5.createGraphics(p5.width, p5.height);
 
     _overlay.fill(255);
@@ -92,41 +111,42 @@ const artwork = (seed: number) => (p5: P5): void => {
 
     overlay.loadPixels();
     const d = 1;
+    const noiseMult = p5.random(0.1, 1000000);
+    const noisePatchiness = 0.12;
     for (let x = 0; x < overlay.width; x++) {
       for (let y = 0; y < overlay.height; y++) {
         const i = 4 * d * (y * d * overlay.width + x);
-        if (p5.noise(x * 0.1, y * 0.1) > 0.2 && p5.random() > 0.4) {
-          overlay.pixels[i] = 0;
-          overlay.pixels[i + 1] = 0;
-          overlay.pixels[i + 2] = 0;
-          overlay.pixels[i + 3] = 255;
-        } else {
+        if (p5.noise(x * noiseMult, y * noiseMult) > noisePatchiness && p5.random() > 0.19) {
           overlay.pixels[i] = 0;
           overlay.pixels[i + 1] = 0;
           overlay.pixels[i + 2] = 0;
           overlay.pixels[i + 3] = 0;
+        } else {
+          overlay.pixels[i] = 0;
+          overlay.pixels[i + 1] = 0;
+          overlay.pixels[i + 2] = 0;
+          overlay.pixels[i + 3] = 255;
         }
       }
     }
     overlay.updatePixels();
 
-    p5.blendMode(p5.OVERLAY);
-    p5.tint(255, 0.7);
+    p5.blendMode(p5.MULTIPLY);
+    p5.tint(255, opacity);
     p5.image(overlay, 0, 0, p5.width, p5.height);
     p5.noTint();
   };
 
   p5.draw = function () {
     const regularBuffer = p5.createGraphics(p5.width, p5.height);
-
     drawThing(regularBuffer);
 
     let blurredBuffer = regularBuffer.get();
     blurredBuffer.filter(p5.BLUR, 1);
-    blurredBuffer.filter(p5.BLUR, 10);
     blurredBuffer.filter(p5.BLUR, 20);
+    blurredBuffer.filter(p5.BLUR, 30);
 
-    p5.tint(255, 0.5);
+    p5.tint(255, 0.8);
     p5.image(blurredBuffer.get(), 0, 0, p5.width, p5.height);
     p5.noTint();
 
@@ -136,13 +156,10 @@ const artwork = (seed: number) => (p5: P5): void => {
 
     const spread = 75;
     p5.image(blurredBuffer.get(), -spread, -spread, p5.width + spread * 2, p5.height + spread * 2);
+    drawNoiseOverlay(0.2);
+    p5.blendMode(p5.HARD_LIGHT);
     p5.image(regularBuffer.get(), 0, 0, p5.width, p5.height);
-
-    drawNoiseOverlay();
-  };
-
-  p5.windowResized = function () {
-    p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
+    drawNoiseOverlay(0.25);
   };
 };
 
