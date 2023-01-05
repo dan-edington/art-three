@@ -5,7 +5,8 @@
   "main": "index.ts",
   "scripts": {
     "build": "webpack --config ./bundler/webpack.prod.js",
-    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider SKETCHNAME=$npm_config_sketch webpack serve --config ./bundler/webpack.dev.js",
+    "start": "cross-env SKETCHNAME=$npm_config_sketch webpack serve --config ./bundler/webpack.dev.js",
+    "start-windows": "cross-env NODE_OPTIONS=--openssl-legacy-provider SKETCHNAME=$npm_config_sketch webpack serve --config ./bundler/webpack.dev.js",
     "lint": "eslint './src/**/*.{js,ts,tsx}' --quiet --fix",
     "new": "plop"
   },

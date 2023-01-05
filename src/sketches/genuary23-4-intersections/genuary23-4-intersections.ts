@@ -16,7 +16,6 @@ import '../../util/noise.js';
 const TAU = Math.PI * 2;
 
 function artwork(this: SketchThreeClass): SketchThreeObject {
-  noise.seed(this.noiseSeed);
   let floor: THREE.Mesh;
   let lights;
 
@@ -35,36 +34,31 @@ function artwork(this: SketchThreeClass): SketchThreeObject {
     this.camera.lookAt(0, 0, 0);
   };
 
-  const createLightLine = () => {
-    const radius = 20;
+  const createLightLine = (lineNumber: number) => {
+    // random radius between 0.005 and 0.01
+    const radius = 0.005 + noise.simplex2(lineNumber, lineNumber * 2) * 0.005;
+
     const vecs: Array<THREE.Vector3> = [];
-    const pointCount = 120;
 
-    let prevX = 0;
-    let prevY = 0;
-    let prevZ = 0;
+    vecs.push(new THREE.Vector3(0, 0, 0));
+    vecs.push(new THREE.Vector3(0, 0, -0.75));
+    vecs.push(new THREE.Vector3(-0.75, 0, -0.75));
 
-    for (let i = 0; i < pointCount; i++) {
-      // const angle = (i / pointCount) * Math.PI * 2;
-      // const x = Math.cos(angle) * radius;
-      // const y = Math.cos(angle * 4) * 1.5;
-      // const z = Math.sin(angle) * radius;
-      const x = prevX + noise.perlin2((prevX + i) * 0.01, (prevZ + i) * 0.01);
-      console.log(noise.perlin2(prevX + i, prevZ + i));
-      const y = 0;
-      const z = prevZ - 2;
+    // add a small amount of noise to vecs
+    vecs.forEach((v) => {
+      v.x += Math.random() * 0.15;
+      v.z += Math.random() * 0.15;
+    });
 
-      vecs.push(new THREE.Vector3(x, y, z));
+    const lightLine = new THREE.CatmullRomCurve3(vecs, false, 'catmullrom', 0.5);
 
-      prevX = x;
-      prevY = y;
-      prevZ = z;
-    }
-
-    const lightLine = new THREE.CatmullRomCurve3(vecs, false, 'centripetal', 2);
-
-    const geometry = new THREE.TubeGeometry(lightLine, 200, 1, 100, false);
-    const material = new THREE.ShaderMaterial({ vertexShader, fragmentShader });
+    const geometry = new THREE.TubeGeometry(lightLine, 60, radius, 100, false);
+    const material = new THREE.MeshBasicMaterial({
+      blending: THREE.MultiplyBlending,
+      color: 0xffe400,
+      opacity: Math.random(),
+      transparent: true,
+    });
 
     return new THREE.Mesh(geometry, material);
   };
@@ -81,19 +75,26 @@ function artwork(this: SketchThreeClass): SketchThreeObject {
     this.scene.add(...Object.values(lights));
   };
 
+  const setupFog = () => {
+    this.scene.fog = new THREE.Fog(0x030b11, 0.1, 1.5);
+  };
+
   const setup = () => {
+    noise.seed(this.seed);
     createLights();
 
     floor = createFloor();
     floor.rotation.x = TAU * -0.25;
     this.scene.add(floor);
 
-    const c = createLightLine();
-    c.scale.set(0.005, 0.005, 0.005);
-    c.position.z = 0.5;
-    c.position.y = 0.009;
-    this.scene.add(c);
+    for (let i = 0; i < 10; i++) {
+      const c = createLightLine(i);
+      c.position.z = 0.5;
+      c.position.y = 0.009;
+      this.scene.add(c);
+    }
 
+    // setupFog();
     positionCamera();
   };
 
