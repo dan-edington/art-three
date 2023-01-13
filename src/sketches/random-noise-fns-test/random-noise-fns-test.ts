@@ -1,11 +1,11 @@
 import P5 from 'p5';
 import { Artwork } from '../../types/artwork';
 import { SketchP5ArtworkFunction } from '../../types/sketchP5';
-import Random from './random';
-import PerlinNoise from './noise';
+import Random from '../../util/random';
+import PerlinNoise from '../../util/noise';
 
 const artwork = (seed: number) => (p5: P5): void => {
-  const noise = new PerlinNoise(2332);
+  const noise = new PerlinNoise(21332);
   p5.setup = function () {
     p5.noiseSeed(seed);
     p5.randomSeed(seed);
